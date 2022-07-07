@@ -1,8 +1,11 @@
 package com.borlanddev.natife_finally.ui.chat
 
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class ChatVM(
+@HiltViewModel
+class ChatVM @Inject constructor (
 
 ) : ViewModel(){
 }

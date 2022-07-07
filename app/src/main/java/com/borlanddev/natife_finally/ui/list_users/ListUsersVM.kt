@@ -1,8 +1,11 @@
 package com.borlanddev.natife_finally.ui.list_users
 
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class ListUsersVM(
+@HiltViewModel
+class ListUsersVM @Inject constructor(
 
 ): ViewModel() {
 }
