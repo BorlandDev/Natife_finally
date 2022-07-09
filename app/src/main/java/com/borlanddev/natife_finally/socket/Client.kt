@@ -7,7 +7,7 @@ import com.borlanddev.natife_finally.helpers.UDP_PORT
 import com.borlanddev.natife_finally.model.BaseDto
 import com.borlanddev.natife_finally.model.ConnectDto
 import com.borlanddev.natife_finally.model.ConnectedDto
-import com.borlanddev.natife_finally.model.PongDto
+import com.borlanddev.natife_finally.model.GetUsersDto
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import model.PingDto
@@ -17,9 +17,12 @@ import java.net.DatagramSocket
 import java.net.InetAddress
 import java.net.Socket
 
+
 class Client {
 
     private var clientIP: String = ""
+    private var id = ""
+    private var response: String? = null
     private val timeout = 20_000
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -57,7 +60,6 @@ class Client {
         }
     }
 
-
     private suspend fun tcpConnect(clientIP: String) {
         scope.launch(Dispatchers.IO) {
             val gson = Gson()
@@ -66,26 +68,42 @@ class Client {
 
             val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
             val writer = PrintWriter(OutputStreamWriter(socket.getOutputStream()))
-            val id: String
 
             try {
-                id = reader.readLine()
-                Log.d("AAA_ServerID", id)
+                scope.launch(Dispatchers.IO) {
+                    while (true) {
+                        response = reader.readLine()
+                        Log.d("AAA_response", response.toString())
 
-                val ping = gson.toJson(BaseDto(BaseDto.Action.PING, gson.toJson(PingDto(id))))
-                val pong = gson.toJson(BaseDto(BaseDto.Action.PONG, gson.toJson(PongDto(id))))
+                        if (response != null) {
+                            val result = gson.fromJson(response, BaseDto::class.java)
 
-                sendCONNECT(id, writer)
-                sendCONNECTED(id, writer)
-                sendPingToServer(writer, ping)
-                listenerAnswerFromServer(reader)
-
+                            when (result.action) {
+                                BaseDto.Action.CONNECTED -> {
+                                    id = result.payload
+                                    sendCONNECT(id, writer)
+                                    sendPing(id, writer)
+                                    Log.d("AAA_ID", result.payload)
+                                }
+                                BaseDto.Action.PONG -> Log.d("AAA_PONG", "PONG")
+                                BaseDto.Action.USERS_RECEIVED -> Log.d(
+                                    "AAA_USERS_RECEIVED",
+                                    "USERS_RECEIVED"
+                                )
+                                BaseDto.Action.CONNECT -> Log.d("AAA_Connect", "CONNECT")
+                                BaseDto.Action.PING -> Log.d("AAA_PING", "PING")
+                                BaseDto.Action.GET_USERS -> Log.d("AAA_GET_USERS", "GET_USERS")
+                                BaseDto.Action.SEND_MESSAGE-> Log.d("AAA_SEND_MESSAGE", "SEND_MESSAGE")
+                                BaseDto.Action.NEW_MESSAGE-> Log.d("AAA_NEW_MESSAGE", "SEND_NEW_MESSAGE")
+                                BaseDto.Action.DISCONNECT-> Log.d("AAA_DISCONNECT", "SEND_DISCONNECT")
+                            }
+                        }
+                    }
+                }
                 writer.flush()
             } catch (e: IOException) {
                 e.printStackTrace()
             }
-
-
         }
     }
 
@@ -106,6 +124,26 @@ class Client {
         }
     }
 
+    private suspend fun sendPing(id: String, writer: PrintWriter) {
+        scope.launch(Dispatchers.IO) {
+            val ping = Gson().toJson(
+                BaseDto(
+                    BaseDto.Action.PING,
+                    Gson().toJson(PingDto(id))
+                )
+            )
+            try {
+                while (true) {
+                    writer.println(ping)
+                   // delay(7_000)
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+
     private fun sendCONNECTED(id: String, writer: PrintWriter) {
         scope.launch(Dispatchers.IO) {
             val connect = Gson().toJson(
@@ -123,24 +161,15 @@ class Client {
         }
     }
 
-    private suspend fun sendPingToServer(writer: PrintWriter, ping: String) {
+
+    private fun getUsers(id: String, writer: PrintWriter) {
         scope.launch(Dispatchers.IO) {
-            while (true) {
-                writer.println(ping)
-                delay(8_000)
-            }
+            val dto = Gson().toJson(BaseDto(BaseDto.Action.GET_USERS, Gson().toJson(GetUsersDto(id))))
+            writer.println(dto)
+            writer.flush()
         }
     }
 
-    private suspend fun listenerAnswerFromServer(reader: BufferedReader) {
-        scope.launch(Dispatchers.IO) {
-            while (true) {
-                val msg: String? = reader.readLine()
-                Log.d("AAA_msg", msg ?: "nothing")
-                delay(5_000)
-            }
-        }
-    }
 
     private fun disconnect(
         socket: Socket,
