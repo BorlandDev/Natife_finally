@@ -1,21 +1,19 @@
 package com.borlanddev.natife_finally
 
 import android.os.Bundle
+import android.util.Log
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
-import com.borlanddev.natife_finally.socket.Client
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private var navController: NavController? = null
-    private val client = Client()
+    private val mainVM: MainVM by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,8 +23,10 @@ class MainActivity : AppCompatActivity() {
         navController = navHost.navController
         navController?.also { setupActionBarWithNavController(it) }
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            client.getToConnection(this)
+        mainVM.data.observe(
+            this
+        ) {
+            Log.d("MainActivity", "$it")
         }
 
     }
