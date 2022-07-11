@@ -1,9 +1,9 @@
 package com.borlanddev.natife_finally.socket
 
 import android.util.Log
-import com.borlanddev.natife_finally.helpers.CLIENT_NAME
 import com.borlanddev.natife_finally.helpers.TCP_PORT
 import com.borlanddev.natife_finally.helpers.UDP_PORT
+import com.borlanddev.natife_finally.helpers.USERNAME_B
 import com.borlanddev.natife_finally.model.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
@@ -14,7 +14,7 @@ import java.net.DatagramSocket
 import java.net.InetAddress
 import java.net.Socket
 
-class Client : CoroutineScope {
+class ClientB : CoroutineScope {
 
     private var id = ""
     private var clientIP = ""
@@ -47,7 +47,7 @@ class Client : CoroutineScope {
                         udpSocket.send(packet)
                         udpSocket.receive(answer)
                         clientIP = answer.address.hostName
-                        Log.d("AAA_clientIP", clientIP)
+                        Log.d("Bob_clientIP", clientIP)
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -73,7 +73,7 @@ class Client : CoroutineScope {
                 scope.launch(Dispatchers.IO) {
                     while (true) {
                         response = reader.readLine()
-                        Log.d("AAA_response", response.toString())
+                        Log.d("Bob_response", response.toString())
                         delay(5_000)
 
                         if (response != null) {
@@ -96,8 +96,7 @@ class Client : CoroutineScope {
                                             UsersReceivedDto::class.java
                                         ).users
 
-
-                                    Log.d("AAA_LIST_USERS", users.size.toString())
+                                    Log.d("Bob_LIST_USERS", result.payload)
                                 }
 
                                 BaseDto.Action.PONG -> {
@@ -106,24 +105,24 @@ class Client : CoroutineScope {
 
                                 BaseDto.Action.SEND_MESSAGE -> {
                                     Log.d(
-                                        "AAA_SEND_MESSAGE",
+                                        "Bob_SEND_MESSAGE",
                                         "SEND_MESSAGE"
                                     )
                                 }
                                 BaseDto.Action.NEW_MESSAGE -> {
                                     Log.d(
-                                        "AAA_NEW_MESSAGE",
+                                        "Bob_NEW_MESSAGE",
                                         "SEND_NEW_MESSAGE"
                                     )
                                 }
                                 BaseDto.Action.DISCONNECT -> {
                                     disconnect(writer, reader)
                                     Log.d(
-                                        "AAA_DISCONNECT",
+                                        "Bob_DISCONNECT",
                                         "SEND_DISCONNECT"
                                     )
                                 }
-                                else -> Log.d("AAA_null", "")
+                                else -> Log.d("Bob_null", "")
                             }
                         }
                     }
@@ -140,7 +139,7 @@ class Client : CoroutineScope {
                 val connect = gson.toJson(
                     BaseDto(
                         BaseDto.Action.CONNECT,
-                        gson.toJson(ConnectDto(id, CLIENT_NAME))
+                        gson.toJson(ConnectDto(id, USERNAME_B))
                     )
                 )
                 writer.println(connect)
