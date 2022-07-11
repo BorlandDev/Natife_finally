@@ -14,7 +14,6 @@ import java.net.DatagramSocket
 import java.net.InetAddress
 import java.net.Socket
 
-
 class Client : CoroutineScope {
 
     private var clientIP = ""
@@ -71,7 +70,7 @@ class Client : CoroutineScope {
                 scope.launch(Dispatchers.IO) {
                     while (true) {
                         response = reader.readLine()
-                        Log.d("AAA_response", response.toString())
+                        //Log.d("AAA_response", response.toString())
                         delay(5_000)
 
                         if (response != null) {
@@ -81,15 +80,13 @@ class Client : CoroutineScope {
                                 BaseDto.Action.CONNECTED -> {
                                     val str = gson.fromJson(result.payload, ID::class.java)
                                     id = str.id
-                                    sendCONNECT(id, writer)
+                                    sendCONNECT(writer)
                                     delay(3_000)
 
-                                    getUsers(id, writer)
+                                    getUsers(writer)
                                 }
 
-
                                 BaseDto.Action.USERS_RECEIVED -> {
-
                                     val users =
                                         gson.fromJson(result.payload, UsersReceivedDto::class.java)
                                     Log.d("AAA_LIST_USERS", users.users.toString())
@@ -129,7 +126,7 @@ class Client : CoroutineScope {
         }
     }
 
-    private fun sendCONNECT(id: String, writer: PrintWriter) {
+    private fun sendCONNECT(writer: PrintWriter) {
         try {
             scope.launch(Dispatchers.IO) {
                 val connect = Gson().toJson(
@@ -139,7 +136,7 @@ class Client : CoroutineScope {
                     )
                 )
                 writer.println(connect)
-                sendPing(id, writer)
+                sendPing(writer)
                 writer.flush()
             }
         } catch (e: IOException) {
@@ -147,7 +144,7 @@ class Client : CoroutineScope {
         }
     }
 
-    private suspend fun sendPing(id: String, writer: PrintWriter) {
+    private suspend fun sendPing( writer: PrintWriter) {
         try {
             scope.launch(Dispatchers.IO) {
                 val ping = Gson().toJson(
@@ -167,24 +164,7 @@ class Client : CoroutineScope {
         }
     }
 
-    private fun sendCONNECTED(id: String, writer: PrintWriter) {
-        try {
-            scope.launch(Dispatchers.IO) {
-                val connected = Gson().toJson(
-                    BaseDto(
-                        BaseDto.Action.CONNECTED,
-                        Gson().toJson(ConnectedDto(id))
-                    )
-                )
-                writer.println(connected)
-                writer.flush()
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun getUsers(id: String, writer: PrintWriter) {
+    private fun getUsers(writer: PrintWriter) {
         try {
             scope.launch(Dispatchers.IO) {
                 val dto = Gson().toJson(
