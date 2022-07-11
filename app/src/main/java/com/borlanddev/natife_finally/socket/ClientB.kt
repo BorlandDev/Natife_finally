@@ -111,10 +111,21 @@ class ClientB : CoroutineScope {
                                         result.payload
                                     )
                                 }
+
                                 BaseDto.Action.NEW_MESSAGE -> {
+                                    val person = gson.fromJson(
+                                        result.payload,
+                                        MessageDto::class.java
+                                    ).from.name
+
+                                    val message = gson.fromJson(
+                                        result.payload,
+                                        MessageDto::class.java
+                                    ).message
+
                                     Log.d(
                                         "Bob_NEW_MESSAGE",
-                                        result.payload
+                                        "Message from: $person - $message"
                                     )
                                 }
                                 BaseDto.Action.DISCONNECT -> {
@@ -165,7 +176,7 @@ class ClientB : CoroutineScope {
                 while (true) {
                     writer.println(ping)
                     writer.flush()
-                    delay(7_000)
+                    delay(8_000)
 
                     pinPong.launch {
                         delay(10_000)

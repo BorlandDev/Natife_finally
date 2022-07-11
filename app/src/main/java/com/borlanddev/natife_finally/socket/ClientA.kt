@@ -112,9 +112,19 @@ class ClientA : CoroutineScope {
                                     )
                                 }
                                 BaseDto.Action.NEW_MESSAGE -> {
+                                    val person = gson.fromJson(
+                                        result.payload,
+                                        MessageDto::class.java
+                                    ).from.name
+
+                                    val message = gson.fromJson(
+                                        result.payload,
+                                        MessageDto::class.java
+                                    ).message
+
                                     Log.d(
-                                        "ALice_NEW_MESSAGE",
-                                        result.payload
+                                        "Alice_NEW_MESSAGE",
+                                        "Message from: $person - $message"
                                     )
                                 }
                                 BaseDto.Action.DISCONNECT -> {
