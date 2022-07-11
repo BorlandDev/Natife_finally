@@ -2,12 +2,10 @@ package com.borlanddev.natife_finally.socket
 
 import android.util.Log
 import com.borlanddev.natife_finally.helpers.CLIENT_NAME
-import com.borlanddev.natife_finally.helpers.ID
 import com.borlanddev.natife_finally.helpers.TCP_PORT
 import com.borlanddev.natife_finally.helpers.UDP_PORT
 import com.borlanddev.natife_finally.model.*
 import com.google.gson.Gson
-import com.google.gson.JsonParser
 import kotlinx.coroutines.*
 import model.PingDto
 import java.io.*
@@ -65,8 +63,6 @@ class Client : CoroutineScope {
             val gson = Gson()
             val socket = Socket(clientIP, TCP_PORT)
             socket.soTimeout = timeout
-            val parser = JsonParser()
-
 
             val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
             val writer = PrintWriter(OutputStreamWriter(socket.getOutputStream()))
@@ -86,37 +82,23 @@ class Client : CoroutineScope {
                                     val str = gson.fromJson(result.payload, ID::class.java)
                                     id = str.id
                                     sendCONNECT(id, writer)
-                                    sendCONNECTED(id, writer)
-                                    getUsers(id, writer)
+                                    delay(3_000)
+
+                                    getUsers(id,writer)
                                 }
 
-                                BaseDto.Action.PONG -> {
-                                    Log.d("AAA_PONG", "PONG")
-                                }
 
                                 BaseDto.Action.USERS_RECEIVED -> {
-                                    Log.d(
-                                        "AAA_USERS_RECEIVED",
-                                        "USERS_RECEIVED"
-                                    )
-                                }
-                                BaseDto.Action.CONNECT -> {
-                                    Log.d(
-                                        "AAA_Connect",
-                                        "CONNECT"
-                                    )
+
+                                    val users =
+                                        gson.fromJson(result.payload, UsersReceivedDto::class.java)
+                                    Log.d("AAA_LIST_USERS", users.users.toString())
+
+                                    for (i in users.users) {
+                                        Log.d("AAA_USER", "$i")
+                                    }
                                 }
 
-                                BaseDto.Action.PING -> {
-                                    Log.d("AAA_PING", "PING")
-                                }
-
-                                BaseDto.Action.GET_USERS -> {
-                                    Log.d(
-                                        "AAA_GET_USERS",
-                                        "GET_USERS"
-                                    )
-                                }
                                 BaseDto.Action.SEND_MESSAGE -> {
                                     Log.d(
                                         "AAA_SEND_MESSAGE",
@@ -136,6 +118,7 @@ class Client : CoroutineScope {
                                         "SEND_DISCONNECT"
                                     )
                                 }
+                                else -> Log.d("AAA_null", "null")
                             }
                         }
                     }
@@ -184,7 +167,6 @@ class Client : CoroutineScope {
         }
     }
 
-
     private fun sendCONNECTED(id: String, writer: PrintWriter) {
         try {
             scope.launch(Dispatchers.IO) {
@@ -202,12 +184,15 @@ class Client : CoroutineScope {
         }
     }
 
-
     private fun getUsers(id: String, writer: PrintWriter) {
         try {
             scope.launch(Dispatchers.IO) {
-                val dto =
-                    Gson().toJson(BaseDto(BaseDto.Action.GET_USERS, Gson().toJson(GetUsersDto(id))))
+                val dto = Gson().toJson(
+                    BaseDto(
+                        BaseDto.Action.GET_USERS,
+                        Gson().toJson(GetUsersDto(id))
+                    )
+                )
                 writer.println(dto)
                 writer.flush()
             }
@@ -215,7 +200,6 @@ class Client : CoroutineScope {
             e.printStackTrace()
         }
     }
-
 
     private fun disconnect(
         socket: Socket,
