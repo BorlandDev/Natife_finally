@@ -84,7 +84,7 @@ class Client : CoroutineScope {
                                     sendCONNECT(id, writer)
                                     delay(3_000)
 
-                                    getUsers(id,writer)
+                                    getUsers(id, writer)
                                 }
 
 
