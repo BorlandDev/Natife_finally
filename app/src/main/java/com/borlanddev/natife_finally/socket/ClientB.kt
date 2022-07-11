@@ -16,8 +16,9 @@ import java.net.Socket
 
 class ClientB : CoroutineScope {
 
-    private var id = ""
-    private var clientIP = ""
+    private var myID = ""
+    private var anotherID = ""
+    private var myIP = ""
     private val gson = Gson()
     private val timeout = 20_000
     private var socket: Socket? = null
@@ -42,17 +43,17 @@ class ClientB : CoroutineScope {
                 val answer = DatagramPacket(
                     message2, message2.size
                 )
-                while (clientIP.isEmpty()) {
+                while (myIP.isEmpty()) {
                     try {
                         udpSocket.send(packet)
                         udpSocket.receive(answer)
-                        clientIP = answer.address.hostName
-                        Log.d("Bob_clientIP", clientIP)
+                        myIP = answer.address.hostName
+                        Log.d("Bob_clientIP", myIP)
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
                 }
-                tcpConnect(clientIP)
+                tcpConnect(myIP)
             } catch (e: IOException) {
                 e.printStackTrace()
             } finally {
@@ -81,7 +82,7 @@ class ClientB : CoroutineScope {
 
                             when (result.action) {
                                 BaseDto.Action.CONNECTED -> {
-                                    id = gson.fromJson(result.payload, ID::class.java).id
+                                    myID = gson.fromJson(result.payload, ID::class.java).id
 
                                     sendConnect(writer, reader)
                                     delay(3_000)
@@ -96,7 +97,8 @@ class ClientB : CoroutineScope {
                                             UsersReceivedDto::class.java
                                         ).users
 
-                                    Log.d("Bob_LIST_USERS", result.payload)
+                                    anotherID = users[0].id
+                                    sendMessage(writer, "Hi, Alice!")
                                 }
 
                                 BaseDto.Action.PONG -> {
@@ -106,13 +108,13 @@ class ClientB : CoroutineScope {
                                 BaseDto.Action.SEND_MESSAGE -> {
                                     Log.d(
                                         "Bob_SEND_MESSAGE",
-                                        "SEND_MESSAGE"
+                                        result.payload
                                     )
                                 }
                                 BaseDto.Action.NEW_MESSAGE -> {
                                     Log.d(
                                         "Bob_NEW_MESSAGE",
-                                        "SEND_NEW_MESSAGE"
+                                        result.payload
                                     )
                                 }
                                 BaseDto.Action.DISCONNECT -> {
@@ -139,7 +141,7 @@ class ClientB : CoroutineScope {
                 val connect = gson.toJson(
                     BaseDto(
                         BaseDto.Action.CONNECT,
-                        gson.toJson(ConnectDto(id, USERNAME_B))
+                        gson.toJson(ConnectDto(myID, USERNAME_B))
                     )
                 )
                 writer.println(connect)
@@ -157,7 +159,7 @@ class ClientB : CoroutineScope {
                 val ping = gson.toJson(
                     BaseDto(
                         BaseDto.Action.PING,
-                        gson.toJson(PingDto(id))
+                        gson.toJson(PingDto(myID))
                     )
                 )
                 while (true) {
@@ -182,7 +184,24 @@ class ClientB : CoroutineScope {
                 val dto = gson.toJson(
                     BaseDto(
                         BaseDto.Action.GET_USERS,
-                        gson.toJson(GetUsersDto(id))
+                        gson.toJson(GetUsersDto(myID))
+                    )
+                )
+                writer.println(dto)
+                writer.flush()
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun sendMessage(writer: PrintWriter, message: String) {
+        try {
+            scope.launch(Dispatchers.IO) {
+                val dto = gson.toJson(
+                    BaseDto(
+                        BaseDto.Action.SEND_MESSAGE,
+                        gson.toJson(SendMessageDto(myID, anotherID, message))
                     )
                 )
                 writer.println(dto)
