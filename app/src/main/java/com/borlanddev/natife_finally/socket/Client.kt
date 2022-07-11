@@ -2,10 +2,12 @@ package com.borlanddev.natife_finally.socket
 
 import android.util.Log
 import com.borlanddev.natife_finally.helpers.CLIENT_NAME
+import com.borlanddev.natife_finally.helpers.ID
 import com.borlanddev.natife_finally.helpers.TCP_PORT
 import com.borlanddev.natife_finally.helpers.UDP_PORT
 import com.borlanddev.natife_finally.model.*
 import com.google.gson.Gson
+import com.google.gson.JsonParser
 import kotlinx.coroutines.*
 import model.PingDto
 import java.io.*
@@ -58,12 +60,13 @@ class Client : CoroutineScope {
         }
     }
 
-
     private suspend fun tcpConnect(clientIP: String) {
         scope.launch(Dispatchers.IO) {
             val gson = Gson()
             val socket = Socket(clientIP, TCP_PORT)
             socket.soTimeout = timeout
+            val parser = JsonParser()
+
 
             val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
             val writer = PrintWriter(OutputStreamWriter(socket.getOutputStream()))
@@ -80,13 +83,15 @@ class Client : CoroutineScope {
 
                             when (result.action) {
                                 BaseDto.Action.CONNECTED -> {
-                                    id = result.payload
+                                    val str = gson.fromJson(result.payload, ID::class.java)
+                                    id = str.id
                                     sendCONNECT(id, writer)
+                                    sendCONNECTED(id, writer)
+                                    getUsers(id, writer)
                                 }
 
                                 BaseDto.Action.PONG -> {
-                                    val pong = Gson().fromJson(result.payload, PongDto::class.java)
-                                    Log.d("AAA_PONG", pong.toString())
+                                    Log.d("AAA_PONG", "PONG")
                                 }
 
                                 BaseDto.Action.USERS_RECEIVED -> {
