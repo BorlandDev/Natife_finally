@@ -1,9 +1,7 @@
 package com.borlanddev.natife_finally.socket
 
 import android.util.Log
-import com.borlanddev.natife_finally.helpers.TCP_PORT
-import com.borlanddev.natife_finally.helpers.UDP_PORT
-import com.borlanddev.natife_finally.helpers.USERNAME
+import com.borlanddev.natife_finally.helpers.*
 import com.borlanddev.natife_finally.model.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
@@ -15,7 +13,7 @@ import java.net.DatagramSocket
 import java.net.InetAddress
 import java.net.Socket
 
-class Client : CoroutineScope {
+class Client(private val prefs: Prefs) : CoroutineScope {
 
     private var clientID = ""
     private val gson = Gson()
@@ -89,11 +87,13 @@ class Client : CoroutineScope {
                                         connect = it
                                     }
 
-                                    clientID =
-                                        gson.fromJson(result.payload, ConnectedDto::class.java).id
-                                    Log.d("Client_ID", clientID)
+                                    clientID = gson.fromJson(
+                                        result.payload, ConnectedDto::class.java
+                                    ).id
 
                                     sendPing()
+
+                                    // для тестов
                                     sendConnect(USERNAME)
                                 }
 
@@ -133,7 +133,10 @@ class Client : CoroutineScope {
     private fun sendConnect(username: String) {
         try {
             scope.launch(Dispatchers.IO) {
-                // запись в префы
+                prefs.preferences.edit()
+                    .putString(APP_PREFERENCES, username)
+                    .apply()
+
                 val dto = gson.toJson(
                     BaseDto(
                         BaseDto.Action.CONNECT,
