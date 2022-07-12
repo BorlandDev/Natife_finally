@@ -93,8 +93,7 @@ class Client(private val prefs: Prefs) : CoroutineScope {
 
                                     sendPing()
 
-                                    // для тестов
-                                    sendConnect(USERNAME)
+                                    sendConnect(prefs.preferences.getString(APP_PREFERENCES, "").toString())
                                 }
 
                                 BaseDto.Action.USERS_RECEIVED -> {

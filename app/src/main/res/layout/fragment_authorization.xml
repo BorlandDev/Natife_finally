@@ -4,18 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.authorization.AuthorizationFragment"
-    >
+    android:fillViewport="true"
+    tools:context=".ui.authorization.AuthorizationFragment">
 
-    <TextView
+    <EditText
+        android:id="@+id/singInTextInput"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Authorization"
-        android:textSize="50sp"
-
+        android:hint="@string/hint_name"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/signUpButton"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@id/signUpButton"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3" />
+
+    <Button
+        android:id="@+id/signUpButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/authorization_button"
+        android:layout_marginTop="@dimen/medium_space"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toBottomOf="@id/singInTextInput" />
 </androidx.constraintlayout.widget.ConstraintLayout>
