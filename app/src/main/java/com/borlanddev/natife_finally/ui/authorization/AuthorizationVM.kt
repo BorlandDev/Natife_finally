@@ -29,6 +29,7 @@ class AuthorizationVM @Inject constructor(
 
     fun authorization(username: String) {
         prefs.preferences.edit().putString(APP_PREFERENCES, username).apply()
+
         viewModelScope.launch (Dispatchers.IO) {
             try {
                 client.getToConnection(username)

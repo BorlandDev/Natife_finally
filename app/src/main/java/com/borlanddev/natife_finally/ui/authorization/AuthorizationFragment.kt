@@ -34,12 +34,11 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
                 val toast = Toast.makeText(
                     requireContext(),
                     R.string.wrong_authorization,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 )
                 toast.show()
             } else {
-                    authorizationVM.authorization(username)
-                }
+                authorizationVM.authorization(username)
 
                 binding?.also {
                     it.progressBar.visibility = View.VISIBLE
@@ -49,7 +48,7 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
                 goToListUsers()
             }
         }
-
+    }
 
     private fun goToListUsers() {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
