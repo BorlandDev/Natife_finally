@@ -6,6 +6,7 @@ import com.borlanddev.natife_finally.helpers.APP_PREFERENCES
 import com.borlanddev.natife_finally.helpers.Prefs
 import com.borlanddev.natife_finally.socket.Client
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -28,7 +29,7 @@ class AuthorizationVM @Inject constructor(
 
     fun authorization(username: String) {
         prefs.preferences.edit().putString(APP_PREFERENCES, username).apply()
-        viewModelScope.launch {
+        viewModelScope.launch (Dispatchers.IO) {
             try {
                 client.getToConnection(username)
 

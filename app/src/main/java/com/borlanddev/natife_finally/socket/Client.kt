@@ -222,6 +222,7 @@ class Client @Inject constructor(
     }
 
     fun disconnect() {
+        singedIn = false
         writer?.flush()
         writer?.close()
         reader?.close()
