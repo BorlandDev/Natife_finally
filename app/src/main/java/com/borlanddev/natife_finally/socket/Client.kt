@@ -1,7 +1,8 @@
 package com.borlanddev.natife_finally.socket
 
 import android.util.Log
-import com.borlanddev.natife_finally.helpers.*
+import com.borlanddev.natife_finally.helpers.TCP_PORT
+import com.borlanddev.natife_finally.helpers.UDP_PORT
 import com.borlanddev.natife_finally.model.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
@@ -12,12 +13,18 @@ import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
 import java.net.Socket
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class Client(private val prefs: Prefs) : CoroutineScope {
+@Singleton
+class Client @Inject constructor(
+) : CoroutineScope {
 
-    private var clientID = ""
+    var singedIn = false
     private val gson = Gson()
     private val timeout = 20_000
+    private var clientID = ""
+    private var username: String = ""
     private var connect = false
     private var socket: Socket? = null
     private var response: String? = null
@@ -28,11 +35,12 @@ class Client(private val prefs: Prefs) : CoroutineScope {
     private val scope = CoroutineScope(coroutineContext)
     private val pinPong = CoroutineScope(Job() + Dispatchers.Default)
 
-    suspend fun getToConnection() {
+    fun getToConnection(_username: String) {
         scope.launch(Dispatchers.IO) {
             var clientIP = ""
             val udpSocket = DatagramSocket()
             udpSocket.soTimeout = timeout
+            username = _username
 
             try {
                 val message = ByteArray(1024)
@@ -67,6 +75,7 @@ class Client(private val prefs: Prefs) : CoroutineScope {
         scope.launch(Dispatchers.IO) {
             socket = Socket(clientIP, TCP_PORT)
             socket?.soTimeout = timeout
+
             reader = BufferedReader(InputStreamReader(socket?.getInputStream()))
             writer = PrintWriter(OutputStreamWriter(socket?.getOutputStream()))
 
@@ -92,8 +101,7 @@ class Client(private val prefs: Prefs) : CoroutineScope {
                                     ).id
 
                                     sendPing()
-
-                                    sendConnect(prefs.preferences.getString(APP_PREFERENCES, "").toString())
+                                    sendConnect(username)
                                 }
 
                                 BaseDto.Action.USERS_RECEIVED -> {
@@ -121,32 +129,13 @@ class Client(private val prefs: Prefs) : CoroutineScope {
                                 else -> Log.d("Client_null", "")
                             }
                         }
+
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }
                 } while (connect)
             }
-        }
-    }
 
-    private fun sendConnect(username: String) {
-        try {
-            scope.launch(Dispatchers.IO) {
-                prefs.preferences.edit()
-                    .putString(APP_PREFERENCES, username)
-                    .apply()
-
-                val dto = gson.toJson(
-                    BaseDto(
-                        BaseDto.Action.CONNECT,
-                        gson.toJson(ConnectDto(clientID, username))
-                    )
-                )
-                writer?.println(dto)
-                writer?.flush()
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
         }
     }
 
@@ -174,7 +163,31 @@ class Client(private val prefs: Prefs) : CoroutineScope {
         }
     }
 
-    private fun getUsers() {
+    private fun sendConnect(username: String) {
+        scope.launch(Dispatchers.IO) {
+            val dto = gson.toJson(
+                BaseDto(
+                    BaseDto.Action.CONNECT,
+                    gson.toJson(ConnectDto(clientID, username))
+                )
+            )
+            try {
+                writer?.println(dto)
+                writer?.flush()
+
+                flow {
+                    emit(true)
+                }.collect {
+                    singedIn = it
+                }
+
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun getUsers() {
         scope.launch(Dispatchers.IO) {
             try {
                 val dto = gson.toJson(
@@ -191,7 +204,7 @@ class Client(private val prefs: Prefs) : CoroutineScope {
         }
     }
 
-    private fun sendMessage(message: String, anotherID: String) {
+    fun sendMessage(message: String, anotherID: String) {
         scope.launch(Dispatchers.IO) {
             try {
                 val dto = gson.toJson(
@@ -208,8 +221,7 @@ class Client(private val prefs: Prefs) : CoroutineScope {
         }
     }
 
-
-    private fun disconnect() {
+    fun disconnect() {
         writer?.flush()
         writer?.close()
         reader?.close()

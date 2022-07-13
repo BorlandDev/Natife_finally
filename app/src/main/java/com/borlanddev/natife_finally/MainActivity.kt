@@ -1,7 +1,6 @@
 package com.borlanddev.natife_finally
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -18,10 +17,6 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
 
     private var navController: NavController? = null
-    private val mainVM: MainVM by viewModels()
-
-    @Inject
-    lateinit var prefs: Prefs
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,36 +24,9 @@ class MainActivity : AppCompatActivity() {
         val navHost = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
         navController = navHost.navController
 
-        if (isSignedIn()) {
-            val direction =
-                AuthorizationFragmentDirections.actionAuthorizationFragmentToListUsersFragment()
-            navController?.navigate(
-                direction,
-                navOptions {
-                    anim {
-                        enter = R.anim.enter
-                        exit = R.anim.exit
-                        popEnter = R.anim.pop_enter
-                        popExit = R.anim.pop_exit
-                    }
-                })
-        } else {
-            navController?.navigate(R.id.authorizationFragment)
-        }
-
         navController?.also { setupActionBarWithNavController(it) }
-
-        mainVM.data.observe(
-            this
-        ) {
-            Log.d("MainActivity", "$it")
-        }
     }
 
     override fun onSupportNavigateUp(): Boolean =
         (navController?.navigateUp() ?: false) || super.onSupportNavigateUp()
-
-    private fun isSignedIn(): Boolean = prefs.preferences.getString(
-        APP_PREFERENCES, ""
-    )?.isNotEmpty() == true
 }

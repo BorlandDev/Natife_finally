@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Natife_finally</string>
-    <string name="hint_name">Введите ваше имя:</string>
-    <string name="authorization_button">Авторизоватся</string>
-    <string name="wrong_authorization">Ошибка: имя пользователя не должно быть пустым</string>
+    <string name="hint_name">Please enter your name:</string>
+    <string name="authorization_button">Log in</string>
+    <string name="wrong_authorization">Error: username must not be empty</string>
+    <string name="log_out_button">Log out</string>
+    <string name="user_image_description">User</string>
 </resources>
