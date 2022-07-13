@@ -227,7 +227,7 @@ class Client @Inject constructor(
         writer?.close()
         reader?.close()
         socket?.close()
-        scope.cancel()
+        scope.coroutineContext.job.cancelChildren()
     }
 }
 
