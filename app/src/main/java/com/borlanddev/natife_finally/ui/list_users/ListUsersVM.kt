@@ -8,6 +8,7 @@ import com.borlanddev.natife_finally.model.User
 import com.borlanddev.natife_finally.socket.Client
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -19,20 +20,14 @@ class ListUsersVM @Inject constructor(
     private val prefs: Prefs
 ) : ViewModel() {
 
-    init {
-        getUsers()
-    }
+    var listUsersFlow = MutableSharedFlow<List<User>>()
 
-    var stateFlow = MutableStateFlow(listOf<User>())
-
-    private fun getUsers() {
+    fun getUsers() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                while (true) {
                     client.getUsers()
-                    client.stateFlow.collect {
-                        stateFlow.value = it
-                    }
+                    client.sharedFlow.collect {
+                        listUsersFlow.emit(it)
                 }
             } catch (e: IOException) {
                 e.printStackTrace()

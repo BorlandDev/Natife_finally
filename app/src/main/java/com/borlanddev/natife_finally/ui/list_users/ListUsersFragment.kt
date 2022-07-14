@@ -34,7 +34,7 @@ class ListUsersFragment : Fragment(R.layout.fragment_list_users) {
         })
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-            listUsersVM.stateFlow.collect {
+            listUsersVM.listUsersFlow.collect {
                 userAdapter.updateUsersList(it)
             }
         }
@@ -43,6 +43,13 @@ class ListUsersFragment : Fragment(R.layout.fragment_list_users) {
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = userAdapter
         }
+
+        binding?.swipeRefreshLayout?.setOnRefreshListener {
+            listUsersVM.getUsers()
+            binding?.swipeRefreshLayout?.isRefreshing = false
+        }
+
+
 
         binding?.LogOutButton?.setOnClickListener {
             listUsersVM.logOut()

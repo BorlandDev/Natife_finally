@@ -6,6 +6,7 @@ import com.borlanddev.natife_finally.helpers.UDP_PORT
 import com.borlanddev.natife_finally.model.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import model.PingDto
@@ -31,7 +32,7 @@ class Client @Inject constructor(
     private var response: String? = null
     private var writer: PrintWriter? = null
     private var reader: BufferedReader? = null
-    var stateFlow = MutableStateFlow(listOf<User>())
+    var sharedFlow = MutableSharedFlow<List<User>>()
     override val coroutineContext = (Job() + Dispatchers.IO)
     private val scope = CoroutineScope(coroutineContext)
     private val pinPong = CoroutineScope(Job() + Dispatchers.Default)
@@ -100,16 +101,16 @@ class Client @Inject constructor(
                                     clientID = gson.fromJson(
                                         result.payload, ConnectedDto::class.java
                                     ).id
-                                    
+
                                     sendPing()
                                     sendConnect(username)
                                 }
 
                                 BaseDto.Action.USERS_RECEIVED -> {
-                                    stateFlow.value = gson.fromJson(
+                                    sharedFlow.emit(gson.fromJson(
                                         result.payload,
                                         UsersReceivedDto::class.java
-                                    ).users
+                                    ).users)
                                 }
 
                                 BaseDto.Action.PONG -> {
