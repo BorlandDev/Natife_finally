@@ -35,7 +35,7 @@ class ListUsersFragment : Fragment(R.layout.fragment_list_users) {
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
             listUsersVM.listUsersFlow.collect {
-                userAdapter.updateUsersList(it)
+                userAdapter.submitList(it)
             }
         }
 
