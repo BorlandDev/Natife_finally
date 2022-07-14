@@ -2,56 +2,44 @@ package com.borlanddev.natife_finally.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.borlanddev.natife_finally.databinding.ListUsersBinding
 import com.borlanddev.natife_finally.model.User
 
-class UserAdapter(
-    private var onItemClick: (User) -> Unit
-) : ListAdapter<User, UserAdapter.UserHolder>(UsersDiffCallback()) {
+class UserAdapter(private var onItemClick: (User) -> Unit) :
+    RecyclerView.Adapter<UserHolder>() {
+
+    private var users: List<User> = emptyList()
+        set(newValue) {
+            field = newValue
+            notifyDataSetChanged()
+        }
+
+    fun updateUsersList(_users: List<User>) {
+        users = _users
+    }
+
+    override fun getItemCount(): Int = users.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserHolder {
-        return UserHolder.create(parent)
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ListUsersBinding.inflate(inflater, parent, false)
+        return UserHolder(binding)
     }
 
     override fun onBindViewHolder(holder: UserHolder, position: Int) {
-        holder.bind(getItem(position), onItemClick)
+        val user = users[position]
+        holder.bind(user, onItemClick)
     }
+}
 
-    class UserHolder(private val binding: ListUsersBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+class UserHolder(private val binding: ListUsersBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(user: User, onUserClick: (User) -> Unit) {
-            binding.userNameTextView.text = user.name
-            binding.itemUser.setOnClickListener {
-                onUserClick.invoke(user)
-            }
-        }
-
-        companion object {
-            fun create(parent: ViewGroup): UserHolder {
-                return UserHolder(
-                    ListUsersBinding.inflate(
-                        LayoutInflater.from(parent.context),
-                        parent,
-                        false
-                    )
-                )
-            }
-        }
-    }
-
-    class UsersDiffCallback
-        : DiffUtil.ItemCallback<User>() {
-
-        override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
-            return oldItem == newItem
-        }
-
-        override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
-            return oldItem == newItem
+    fun bind(user: User, onItemClick: (User) -> Unit) {
+        binding.userNameTextView.text = user.name
+        binding.itemUser.setOnClickListener {
+            onItemClick.invoke(user)
         }
     }
 }
+
