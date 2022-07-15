@@ -52,14 +52,14 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
     private fun isSignedIn() {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
             authorizationVM.singedInVM.collect {
-                if (!it) {
+                if (it) {
+                    goToListUsers()
+                } else {
                     binding?.apply {
                         progressBar.visibility = View.VISIBLE
                         signUpButton.isEnabled = false
                         singInTextInput.isEnabled = false
                     }
-                } else {
-                    goToListUsers()
                 }
             }
         }
@@ -70,9 +70,8 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
             progressBar.visibility = View.INVISIBLE
             signUpButton.isEnabled = true
             singInTextInput.isEnabled = true
-
-            findNavController().navigate(R.id.action_authorizationFragment_to_listUsersFragment)
         }
+        findNavController().navigate(R.id.action_authorizationFragment_to_listUsersFragment)
     }
 
 

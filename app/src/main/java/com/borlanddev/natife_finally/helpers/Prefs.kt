@@ -11,19 +11,19 @@ class Prefs @Inject constructor(
     @ApplicationContext context: Context
 ) {
     private val preferences = (context.getSharedPreferences(
-        APP_PREFERENCES,
+        USERNAME,
         Context.MODE_PRIVATE
     )) as SharedPreferences
 
     fun putUsername(username: String) {
-        preferences.edit().putString(APP_PREFERENCES, username).apply()
+        preferences.edit().putString(USERNAME, username).apply()
     }
 
     fun getUsername(): String = preferences.getString(
-        APP_PREFERENCES, ""
+        USERNAME, ""
     ).toString()
 
     fun deleteUsername() {
-        preferences.edit().putString(APP_PREFERENCES, "").apply()
+        preferences.edit().putString(USERNAME, "").apply()
     }
 }

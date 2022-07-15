@@ -6,7 +6,6 @@ import com.borlanddev.natife_finally.helpers.UDP_PORT
 import com.borlanddev.natife_finally.model.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -75,7 +74,6 @@ class Client @Inject constructor() {
     }
 
     private fun tcpConnect(clientIP: String) {
-        scope.launch(Dispatchers.IO) {
             socket = Socket(clientIP, TCP_PORT)
             socket?.soTimeout = timeout
 
@@ -86,9 +84,9 @@ class Client @Inject constructor() {
 
             listeningServerResponse()
         }
-    }
 
-    private suspend fun listeningServerResponse() {
+
+    private fun listeningServerResponse() {
         scope.launch(Dispatchers.IO) {
             while (connect.value) {
                 try {
@@ -118,7 +116,7 @@ class Client @Inject constructor() {
                             }
 
                             BaseDto.Action.PONG -> {
-                                pingPong.cancel()
+                                pingPong.coroutineContext.job.cancelChildren()
                             }
 
                             BaseDto.Action.NEW_MESSAGE -> {
@@ -141,7 +139,7 @@ class Client @Inject constructor() {
         }
     }
 
-    private suspend fun sendPing() {
+    private fun sendPing() {
         scope.launch(Dispatchers.IO) {
             val dto = gson.toJson(
                 BaseDto(
@@ -149,9 +147,9 @@ class Client @Inject constructor() {
                     gson.toJson(PingDto(clientID))
                 )
             )
-            while (true) {
+            while (connect.value) {
                 try {
-                    pingPong.launch (Dispatchers.IO) {
+                    pingPong.launch(Dispatchers.IO) {
                         delay(10_000)
                         disconnect()
                     }
@@ -201,7 +199,7 @@ class Client @Inject constructor() {
         }
     }
 
-    suspend fun disconnect() {
+    fun disconnect() {
         scope.launch(Dispatchers.IO) {
             try {
                 val dto = gson.toJson(

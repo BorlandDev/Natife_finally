@@ -1,15 +1,9 @@
 package com.borlanddev.natife_finally.ui.authorization
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.borlanddev.natife_finally.helpers.Prefs
 import com.borlanddev.natife_finally.socket.Client
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
 
@@ -20,25 +14,21 @@ class AuthorizationVM @Inject constructor(
 ) : ViewModel() {
 
     private var savedName = ""
-    private val singedInVMFlow = client.singedIn
-    val singedInVM: Flow<Boolean> = singedInVMFlow
+    val singedInVM = client.singedIn
 
     fun authorization(username: String = savedName) {
         // Если мы авторизованы , берем имя из префов
         if (isSignedIn()) {
             savedName = prefs.getUsername()
+        } else {
+            prefs.putUsername(username)
         }
 
-        // Если не авториованы , берем введенное имя и кладем в префы
-        prefs.putUsername(username)
-
         // Затем коннектимся к серверу с введенным именем
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                client.getToConnection(username)
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
+        try {
+            client.getToConnection(username)
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
     }
 

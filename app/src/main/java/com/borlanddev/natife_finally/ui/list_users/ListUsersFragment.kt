@@ -29,7 +29,7 @@ class ListUsersFragment : Fragment(R.layout.fragment_list_users) {
         })
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-            listUsersVM.listUsersVM.collect {
+            listUsersVM.users.collect {
                 userAdapter.submitList(it)
             }
         }
