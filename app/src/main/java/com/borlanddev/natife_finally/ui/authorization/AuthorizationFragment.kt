@@ -25,17 +25,9 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
 
         // Если мы авторизованы
         if (authorizationVM.isSignedIn()) {
-
             authorizationVM.authorization()
-
             // Нужно дождатся окончания авторизации и тогда перейти на экран
-            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-                authorizationVM.singedInVM.collect {
-                    if (it) {
-                        goToListUsers()
-                    }
-                }
-            }
+            isSignedIn()
         }
 
         // Если не авторизованы - введите не пустое Имя
@@ -51,53 +43,37 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
             } else {
                 // Запускаем авторизацию
                 authorizationVM.authorization(username)
-
-                binding?.apply {
-                    progressBar.visibility = View.VISIBLE
-                    signUpButton.isEnabled = false
-                    singInTextInput.isEnabled = false
-                }
-
                 // Нужно дождатся окончания авторизации и тогда перейти на экран
-                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-                    authorizationVM.singedInVM.collect {
-                        if (it) {
-                            goToListUsers()
-                        }
+                isSignedIn()
+            }
+        }
+    }
+
+    private fun isSignedIn() {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+            authorizationVM.singedInVM.collect {
+                if (!it) {
+                    binding?.apply {
+                        progressBar.visibility = View.VISIBLE
+                        signUpButton.isEnabled = false
+                        singInTextInput.isEnabled = false
                     }
+                } else {
+                    goToListUsers()
                 }
             }
         }
     }
 
+    private fun goToListUsers() {
+        binding?.apply {
+            progressBar.visibility = View.INVISIBLE
+            signUpButton.isEnabled = true
+            singInTextInput.isEnabled = true
 
-private fun isSignedIn(): Boolean {
-    var isSinged = false
-
-    viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-        authorizationVM.singedInVM.collect {
-            isSinged = it
+            findNavController().navigate(R.id.action_authorizationFragment_to_listUsersFragment)
         }
     }
-    return isSinged
-}
-
-private fun isAuthorizationSuccessful(): Boolean {
-
-
-    return false
-}
-
-
-private fun goToListUsers() {
-    binding?.apply {
-        progressBar.visibility = View.INVISIBLE
-        signUpButton.isEnabled = true
-        singInTextInput.isEnabled = true
-
-        findNavController().navigate(R.id.action_authorizationFragment_to_listUsersFragment)
-    }
-}
 
 
 }

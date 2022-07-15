@@ -6,6 +6,7 @@ import com.borlanddev.natife_finally.helpers.Prefs
 import com.borlanddev.natife_finally.socket.Client
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -19,11 +20,10 @@ class AuthorizationVM @Inject constructor(
 ) : ViewModel() {
 
     private var savedName = ""
-    private val singedInVMFlow = MutableSharedFlow<Boolean>()
-    val singedInVM = singedInVMFlow
+    private val singedInVMFlow = client.singedIn
+    val singedInVM: Flow<Boolean> = singedInVMFlow
 
     fun authorization(username: String = savedName) {
-
         // Если мы авторизованы , берем имя из префов
         if (isSignedIn()) {
             savedName = prefs.getUsername()
@@ -36,10 +36,6 @@ class AuthorizationVM @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 client.getToConnection(username)
-
-                client.singedIn.collect {
-                    singedInVM.emit(it)
-                }
             } catch (e: IOException) {
                 e.printStackTrace()
             }

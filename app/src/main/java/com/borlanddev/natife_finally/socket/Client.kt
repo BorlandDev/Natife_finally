@@ -6,8 +6,10 @@ import com.borlanddev.natife_finally.helpers.UDP_PORT
 import com.borlanddev.natife_finally.model.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import model.PingDto
 import java.io.*
 import java.net.DatagramPacket
@@ -30,9 +32,9 @@ class Client @Inject constructor() {
     private var reader: BufferedReader? = null
     private var connect = MutableStateFlow(false)
     private val singedInFlow = MutableSharedFlow<Boolean>()
-    val singedIn = singedInFlow
+    val singedIn: SharedFlow<Boolean> = singedInFlow
     private val listUsersFlow = MutableSharedFlow<List<User>>()
-    val listUsers = listUsersFlow
+    val listUsers: SharedFlow<List<User>> = listUsersFlow
     private val scope = CoroutineScope(Job() + Dispatchers.IO)
     private val pingPong = scope
 
@@ -176,7 +178,6 @@ class Client @Inject constructor() {
                 writer?.flush()
 
                 singedInFlow.emit(true)
-
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -217,11 +218,9 @@ class Client @Inject constructor() {
 
                 reader?.close()
                 socket?.close()
-                scope.coroutineContext.job.cancelChildren()
-
-
                 writer?.close()
 
+                scope.coroutineContext.job.cancelChildren()
             } catch (e: IOException) {
                 e.printStackTrace()
             }
