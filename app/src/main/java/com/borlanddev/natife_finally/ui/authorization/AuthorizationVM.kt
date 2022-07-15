@@ -13,18 +13,18 @@ class AuthorizationVM @Inject constructor(
     private val prefs: Prefs
 ) : ViewModel() {
 
-    private var savedName = ""
     val singedInVM = client.singedIn
 
-    fun authorization(username: String = savedName) {
-        if (isSignedIn()) {
-            savedName = prefs.getUsername()
-        } else {
-            prefs.putUsername(username)
-        }
-
+    fun authorization(username: String = "") {
         try {
-            client.getToConnection(username)
+            if (isSignedIn()) {
+                val savedName = prefs.getUsername()
+                client.getToConnection(savedName)
+            } else {
+                prefs.putUsername(username)
+                client.getToConnection(username)
+            }
+
         } catch (e: IOException) {
             e.printStackTrace()
         }
