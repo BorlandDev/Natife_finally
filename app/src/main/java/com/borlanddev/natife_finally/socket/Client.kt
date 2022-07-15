@@ -23,8 +23,9 @@ class Client @Inject constructor() {
 
     private val gson = Gson()
     private val timeout = 20_000
+    private var username = ""
     private var clientID = ""
-    private var username: String = ""
+    private var pingPong: Job? = null
     private var socket: Socket? = null
     private var response: String? = null
     private var writer: PrintWriter? = null
@@ -35,7 +36,6 @@ class Client @Inject constructor() {
     private val listUsersFlow = MutableSharedFlow<List<User>>()
     val listUsers: SharedFlow<List<User>> = listUsersFlow
     private val scope = CoroutineScope(Job() + Dispatchers.IO)
-    private var pingPong: Job? = null
 
     fun getToConnection(newName: String) {
         scope.launch(Dispatchers.IO) {
@@ -74,16 +74,16 @@ class Client @Inject constructor() {
     }
 
     private fun tcpConnect(clientIP: String) {
-            socket = Socket(clientIP, TCP_PORT)
-            socket?.soTimeout = timeout
+        socket = Socket(clientIP, TCP_PORT)
+        socket?.soTimeout = timeout
 
-            connect.value = true
+        connect.value = true
 
-            reader = BufferedReader(InputStreamReader(socket?.getInputStream()))
-            writer = PrintWriter(OutputStreamWriter(socket?.getOutputStream()))
+        reader = BufferedReader(InputStreamReader(socket?.getInputStream()))
+        writer = PrintWriter(OutputStreamWriter(socket?.getOutputStream()))
 
-            listeningServerResponse()
-        }
+        listeningServerResponse()
+    }
 
 
     private fun listeningServerResponse() {
@@ -213,7 +213,7 @@ class Client @Inject constructor() {
 
                 connect.value = false
                 singedInFlow.emit(false)
-
+                clearListUsers()
                 reader?.close()
                 socket?.close()
                 writer?.close()
@@ -225,6 +225,11 @@ class Client @Inject constructor() {
         }
     }
 
+    fun clearListUsers() {
+        scope.launch(Dispatchers.IO) {
+            listUsersFlow.emit(listOf())
+        }
+    }
 
 }
 

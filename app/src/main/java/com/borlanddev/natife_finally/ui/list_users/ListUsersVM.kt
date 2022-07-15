@@ -32,5 +32,4 @@ class ListUsersVM @Inject constructor(
         client.disconnect()
     }
 
-
 }
