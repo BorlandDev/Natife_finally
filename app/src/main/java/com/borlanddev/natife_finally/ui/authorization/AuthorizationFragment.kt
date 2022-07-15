@@ -23,11 +23,22 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentAuthorizationBinding.bind(view)
 
+        // Если мы авторизованы
         if (authorizationVM.isSignedIn()) {
-            authorizationVM.provideUsername()
-            goToListUsers()
+
+            authorizationVM.authorization()
+
+            // Нужно дождатся окончания авторизации и тогда перейти на экран
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+                authorizationVM.singedInVM.collect {
+                    if (it) {
+                        goToListUsers()
+                    }
+                }
+            }
         }
 
+        // Если не авторизованы - введите не пустое Имя
         binding?.signUpButton?.setOnClickListener {
             val username = binding?.singInTextInput?.text.toString()
             if (username.isEmpty()) {
@@ -38,32 +49,58 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
                 )
                 toast.show()
             } else {
+                // Запускаем авторизацию
                 authorizationVM.authorization(username)
 
-                binding?.also {
-                    it.progressBar.visibility = View.VISIBLE
-                    it.signUpButton.isEnabled = false
-                    it.singInTextInput.isEnabled = false
+                binding?.apply {
+                    progressBar.visibility = View.VISIBLE
+                    signUpButton.isEnabled = false
+                    singInTextInput.isEnabled = false
                 }
-                goToListUsers()
+
+                // Нужно дождатся окончания авторизации и тогда перейти на экран
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+                    authorizationVM.singedInVM.collect {
+                        if (it) {
+                            goToListUsers()
+                        }
+                    }
+                }
             }
         }
     }
 
-    private fun goToListUsers() {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-            authorizationVM.isSigned.collect {
-                if (it) {
-                    binding?.also { view ->
-                        view.progressBar.visibility = View.INVISIBLE
-                        view.signUpButton.isEnabled = true
-                        view.singInTextInput.isEnabled = true
-                    }
-                    findNavController().navigate(R.id.action_authorizationFragment_to_listUsersFragment)
-                }
-            }
+
+private fun isSignedIn(): Boolean {
+    var isSinged = false
+
+    viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+        authorizationVM.singedInVM.collect {
+            isSinged = it
         }
     }
+    return isSinged
 }
+
+private fun isAuthorizationSuccessful(): Boolean {
+
+
+    return false
+}
+
+
+private fun goToListUsers() {
+    binding?.apply {
+        progressBar.visibility = View.INVISIBLE
+        signUpButton.isEnabled = true
+        singInTextInput.isEnabled = true
+
+        findNavController().navigate(R.id.action_authorizationFragment_to_listUsersFragment)
+    }
+}
+
+
+}
+
 
 

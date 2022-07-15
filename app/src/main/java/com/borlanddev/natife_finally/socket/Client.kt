@@ -8,7 +8,6 @@ import com.google.gson.Gson
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flow
 import model.PingDto
 import java.io.*
 import java.net.DatagramPacket
@@ -19,30 +18,30 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class Client @Inject constructor(
-) : CoroutineScope {
+class Client @Inject constructor() {
 
-    var singedIn = false
     private val gson = Gson()
-    private val timeout = 15_000
+    private val timeout = 20_000
     private var clientID = ""
     private var username: String = ""
-    private var connect = false
     private var socket: Socket? = null
     private var response: String? = null
     private var writer: PrintWriter? = null
     private var reader: BufferedReader? = null
-    var sharedFlow = MutableSharedFlow<List<User>>()
-    override val coroutineContext = (Job() + Dispatchers.IO)
-    private val scope = CoroutineScope(coroutineContext)
-    private val pinPong = CoroutineScope(Job() + Dispatchers.Default)
+    private var connect = MutableStateFlow(false)
+    private val singedInFlow = MutableSharedFlow<Boolean>()
+    val singedIn = singedInFlow
+    private val listUsersFlow = MutableSharedFlow<List<User>>()
+    val listUsers = listUsersFlow
+    private val scope = CoroutineScope(Job() + Dispatchers.IO)
+    private val pingPong = scope
 
-    fun getToConnection(_username: String) {
+    fun getToConnection(newName: String) {
         scope.launch(Dispatchers.IO) {
             var clientIP = ""
             val udpSocket = DatagramSocket()
             udpSocket.soTimeout = timeout
-            username = _username
+            username = newName
 
             try {
                 val message = ByteArray(1024)
@@ -73,68 +72,69 @@ class Client @Inject constructor(
         }
     }
 
-    private suspend fun tcpConnect(clientIP: String) {
+    private fun tcpConnect(clientIP: String) {
         scope.launch(Dispatchers.IO) {
             socket = Socket(clientIP, TCP_PORT)
             socket?.soTimeout = timeout
 
+            connect.value = true
+
             reader = BufferedReader(InputStreamReader(socket?.getInputStream()))
             writer = PrintWriter(OutputStreamWriter(socket?.getOutputStream()))
 
-            scope.launch(Dispatchers.IO) {
-                do {
-                    try {
-                        response = reader?.readLine()
-                        Log.d("Client_response", response.toString())
+            listeningServerResponse()
+        }
+    }
 
-                        if (response != null) {
-                            val result = gson.fromJson(response, BaseDto::class.java)
+    private suspend fun listeningServerResponse() {
+        scope.launch(Dispatchers.IO) {
+            while (connect.value) {
+                try {
+                    response = reader?.readLine()
+                    Log.d("Client_response", response.toString())
 
-                            when (result.action) {
-                                BaseDto.Action.CONNECTED -> {
-                                    flow {
-                                        emit(true)
-                                    }.collect {
-                                        connect = it
-                                    }
+                    if (response != null) {
+                        val result = gson.fromJson(response, BaseDto::class.java)
 
-                                    clientID = gson.fromJson(
-                                        result.payload, ConnectedDto::class.java
-                                    ).id
+                        when (result.action) {
+                            BaseDto.Action.CONNECTED -> {
+                                clientID = gson.fromJson(
+                                    result.payload, ConnectedDto::class.java
+                                ).id
 
-                                    sendPing()
-                                    sendConnect(username)
-                                }
+                                sendPing()
+                                sendConnect(username)
+                            }
 
-                                BaseDto.Action.USERS_RECEIVED -> {
-                                    sharedFlow.emit(gson.fromJson(
+                            BaseDto.Action.USERS_RECEIVED -> {
+                                listUsersFlow.emit(
+                                    gson.fromJson(
                                         result.payload,
                                         UsersReceivedDto::class.java
-                                    ).users)
-                                }
-
-                                BaseDto.Action.PONG -> {
-                                    pinPong.cancel()
-                                }
-
-                                BaseDto.Action.NEW_MESSAGE -> {
-                                    val dto = gson.fromJson(
-                                        result.payload,
-                                        MessageDto::class.java
-                                    )
-                                    Log.d(
-                                        "Client_NEW_MESSAGE",
-                                        "Message from: ${dto.from} \n ${dto.message}"
-                                    )
-                                }
-                                else -> Log.d("Client_null", "")
+                                    ).users
+                                )
                             }
-                        }
 
-                    } catch (e: IOException) {
-                        e.printStackTrace()
+                            BaseDto.Action.PONG -> {
+                                pingPong.cancel()
+                            }
+
+                            BaseDto.Action.NEW_MESSAGE -> {
+                                val dto = gson.fromJson(
+                                    result.payload,
+                                    MessageDto::class.java
+                                )
+                                Log.d(
+                                    "Client_NEW_MESSAGE",
+                                    "Message from: ${dto.from} \n ${dto.message}"
+                                )
+                            }
+                            else -> Log.d("Client_null", "")
+                        }
                     }
-                } while (connect)
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
             }
         }
     }
@@ -149,7 +149,7 @@ class Client @Inject constructor(
             )
             while (true) {
                 try {
-                    pinPong.launch {
+                    pingPong.launch (Dispatchers.IO) {
                         delay(10_000)
                         disconnect()
                     }
@@ -175,11 +175,7 @@ class Client @Inject constructor(
                 writer?.println(dto)
                 writer?.flush()
 
-                flow {
-                    emit(true)
-                }.collect {
-                    singedIn = it
-                }
+                singedInFlow.emit(true)
 
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -204,31 +200,35 @@ class Client @Inject constructor(
         }
     }
 
-    fun sendMessage(message: String, anotherID: String) {
+    suspend fun disconnect() {
         scope.launch(Dispatchers.IO) {
             try {
                 val dto = gson.toJson(
                     BaseDto(
-                        BaseDto.Action.SEND_MESSAGE,
-                        gson.toJson(SendMessageDto(clientID, anotherID, message))
+                        BaseDto.Action.DISCONNECT,
+                        gson.toJson(DisconnectDto(clientID, 0))
                     )
                 )
                 writer?.println(dto)
                 writer?.flush()
+
+                connect.value = false
+                singedInFlow.emit(false)
+
+                reader?.close()
+                socket?.close()
+                scope.coroutineContext.job.cancelChildren()
+
+
+                writer?.close()
+
             } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
     }
 
-    fun disconnect() {
-        singedIn = false
-        writer?.flush()
-        writer?.close()
-        reader?.close()
-        socket?.close()
-        scope.coroutineContext.job.cancelChildren()
-    }
+
 }
 
 

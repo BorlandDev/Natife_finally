@@ -2,12 +2,12 @@ package com.borlanddev.natife_finally.ui.authorization
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.borlanddev.natife_finally.helpers.APP_PREFERENCES
 import com.borlanddev.natife_finally.helpers.Prefs
 import com.borlanddev.natife_finally.socket.Client
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
@@ -18,26 +18,27 @@ class AuthorizationVM @Inject constructor(
     private val prefs: Prefs
 ) : ViewModel() {
 
-    private var username = ""
-    var isSigned = flow { emit(false) }
+    private var savedName = ""
+    private val singedInVMFlow = MutableSharedFlow<Boolean>()
+    val singedInVM = singedInVMFlow
 
-    fun provideUsername() {
-        viewModelScope.launch {
-            authorization(username)
+    fun authorization(username: String = savedName) {
+
+        // Если мы авторизованы , берем имя из префов
+        if (isSignedIn()) {
+            savedName = prefs.getUsername()
         }
-    }
 
-    fun authorization(username: String) {
-        prefs.preferences.edit().putString(APP_PREFERENCES, username).apply()
+        // Если не авториованы , берем введенное имя и кладем в префы
+        prefs.putUsername(username)
 
-        viewModelScope.launch (Dispatchers.IO) {
+        // Затем коннектимся к серверу с введенным именем
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 client.getToConnection(username)
 
-                isSigned.collect {
-                    while (!client.singedIn) {
-                        isSigned = flow { emit(true) }
-                    }
+                client.singedIn.collect {
+                    singedInVM.emit(it)
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -45,11 +46,5 @@ class AuthorizationVM @Inject constructor(
         }
     }
 
-    fun isSignedIn(): Boolean {
-        username = prefs.preferences.getString(
-            APP_PREFERENCES, ""
-        ).toString()
-
-        return username.isNotEmpty()
-    }
+    fun isSignedIn(): Boolean = prefs.getUsername().isNotEmpty()
 }

@@ -10,8 +10,20 @@ import javax.inject.Singleton
 class Prefs @Inject constructor(
     @ApplicationContext context: Context
 ) {
-    val preferences = (context.getSharedPreferences(
+    private val preferences = (context.getSharedPreferences(
         APP_PREFERENCES,
         Context.MODE_PRIVATE
     )) as SharedPreferences
+
+    fun putUsername(username: String) {
+        preferences.edit().putString(APP_PREFERENCES, username).apply()
+    }
+
+    fun getUsername(): String = preferences.getString(
+        APP_PREFERENCES, ""
+    ).toString()
+
+    fun deleteUsername() {
+        preferences.edit().putString(APP_PREFERENCES, "").apply()
+    }
 }

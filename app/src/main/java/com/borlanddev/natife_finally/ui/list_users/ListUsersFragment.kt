@@ -24,43 +24,36 @@ class ListUsersFragment : Fragment(R.layout.fragment_list_users) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentListUsersBinding.bind(view)
 
-        binding?.also {
-            it.progressBar.visibility = View.INVISIBLE
-            it.LogOutButton.isEnabled = true
-        }
-
         val userAdapter = UserAdapter(onItemClick = {
             findNavController().navigate(R.id.action_listUsersFragment_to_chatFragment)
         })
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-            listUsersVM.listUsersFlow.collect {
+            listUsersVM.listUsersVM.collect {
                 userAdapter.submitList(it)
             }
         }
 
         binding?.apply {
+            progressBar.visibility = View.INVISIBLE
+            LogOutButton.isEnabled = true
+
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = userAdapter
-        }
 
-        binding?.swipeRefreshLayout?.setOnRefreshListener {
-            listUsersVM.getUsers()
-            binding?.swipeRefreshLayout?.isRefreshing = false
-        }
-
-
-
-        binding?.LogOutButton?.setOnClickListener {
-            listUsersVM.logOut()
-
-            binding?.also {
-                it.progressBar.visibility = View.VISIBLE
-                it.LogOutButton.isEnabled = false
+            swipeRefreshLayout.setOnRefreshListener {
+                listUsersVM.getUsers()
+                swipeRefreshLayout.isRefreshing = false
             }
-            findNavController().navigate(R.id.action_listUsersFragment_to_authorizationFragment)
-        }
 
+            LogOutButton.setOnClickListener {
+                listUsersVM.logOut()
+                progressBar.visibility = View.VISIBLE
+                LogOutButton.isEnabled = false
+
+                findNavController().navigate(R.id.action_listUsersFragment_to_authorizationFragment)
+            }
+        }
 
     }
 }
