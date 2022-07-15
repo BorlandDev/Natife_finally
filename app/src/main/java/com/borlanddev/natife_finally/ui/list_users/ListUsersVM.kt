@@ -15,6 +15,10 @@ class ListUsersVM @Inject constructor(
 
     val users = client.listUsers
 
+    init {
+        getUsers()
+    }
+
     fun getUsers() {
         try {
             client.getUsers()

@@ -23,14 +23,11 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentAuthorizationBinding.bind(view)
 
-        // Если мы авторизованы
         if (authorizationVM.isSignedIn()) {
             authorizationVM.authorization()
-            // Нужно дождатся окончания авторизации и тогда перейти на экран
             isSignedIn()
         }
 
-        // Если не авторизованы - введите не пустое Имя
         binding?.signUpButton?.setOnClickListener {
             val username = binding?.singInTextInput?.text.toString()
             if (username.isEmpty()) {
@@ -41,25 +38,23 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
                 )
                 toast.show()
             } else {
-                // Запускаем авторизацию
                 authorizationVM.authorization(username)
-                // Нужно дождатся окончания авторизации и тогда перейти на экран
                 isSignedIn()
             }
         }
     }
 
     private fun isSignedIn() {
+        binding?.apply {
+            progressBar.visibility = View.VISIBLE
+            signUpButton.isEnabled = false
+            singInTextInput.isEnabled = false
+        }
+
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
             authorizationVM.singedInVM.collect {
                 if (it) {
                     goToListUsers()
-                } else {
-                    binding?.apply {
-                        progressBar.visibility = View.VISIBLE
-                        signUpButton.isEnabled = false
-                        singInTextInput.isEnabled = false
-                    }
                 }
             }
         }

@@ -35,7 +35,7 @@ class Client @Inject constructor() {
     private val listUsersFlow = MutableSharedFlow<List<User>>()
     val listUsers: SharedFlow<List<User>> = listUsersFlow
     private val scope = CoroutineScope(Job() + Dispatchers.IO)
-    private val pingPong = scope
+    private var pingPong: Job? = null
 
     fun getToConnection(newName: String) {
         scope.launch(Dispatchers.IO) {
@@ -116,7 +116,7 @@ class Client @Inject constructor() {
                             }
 
                             BaseDto.Action.PONG -> {
-                                pingPong.coroutineContext.job.cancelChildren()
+                                pingPong?.cancel()
                             }
 
                             BaseDto.Action.NEW_MESSAGE -> {
@@ -149,7 +149,7 @@ class Client @Inject constructor() {
             )
             while (connect.value) {
                 try {
-                    pingPong.launch(Dispatchers.IO) {
+                    pingPong = launch {
                         delay(10_000)
                         disconnect()
                     }

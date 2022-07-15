@@ -17,14 +17,12 @@ class AuthorizationVM @Inject constructor(
     val singedInVM = client.singedIn
 
     fun authorization(username: String = savedName) {
-        // Если мы авторизованы , берем имя из префов
         if (isSignedIn()) {
             savedName = prefs.getUsername()
         } else {
             prefs.putUsername(username)
         }
 
-        // Затем коннектимся к серверу с введенным именем
         try {
             client.getToConnection(username)
         } catch (e: IOException) {
