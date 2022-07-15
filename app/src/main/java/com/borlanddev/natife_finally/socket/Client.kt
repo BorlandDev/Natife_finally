@@ -213,7 +213,6 @@ class Client @Inject constructor() {
 
                 connect.value = false
                 singedInFlow.emit(false)
-                clearListUsers()
                 reader?.close()
                 socket?.close()
                 writer?.close()
@@ -224,13 +223,6 @@ class Client @Inject constructor() {
             }
         }
     }
-
-    fun clearListUsers() {
-        scope.launch(Dispatchers.IO) {
-            listUsersFlow.emit(listOf())
-        }
-    }
-
 }
 
 
