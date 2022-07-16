@@ -1,6 +1,7 @@
 package com.borlanddev.natife_finally.ui.authorization
 
 import androidx.lifecycle.ViewModel
+import com.borlanddev.natife_finally.helpers.DEFAULT_NAME_PREFS
 import com.borlanddev.natife_finally.helpers.Prefs
 import com.borlanddev.natife_finally.socket.Client
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,22 +14,19 @@ class AuthorizationVM @Inject constructor(
     private val prefs: Prefs
 ) : ViewModel() {
 
-    val singedInVM = client.singedIn
+    val singedIn = client.singedIn
 
-    fun authorization(username: String = "") {
+    fun authorization(username: String) {
         try {
-            if (isSignedIn()) {
-                val savedName = prefs.getUsername()
-                client.getToConnection(savedName)
-            } else {
+            if (!isSignedIn()) {
                 prefs.putUsername(username)
-                client.getToConnection(username)
             }
-
+            client.connect(username)
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
 
-    fun isSignedIn(): Boolean = prefs.getUsername().isNotEmpty()
+    fun isSignedIn(): Boolean = prefs.getUsername() != DEFAULT_NAME_PREFS
+    fun getSavedName(): String = prefs.getUsername()
 }

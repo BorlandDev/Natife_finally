@@ -48,7 +48,7 @@ class UserAdapter(private var onItemClick: (User) -> Unit) :
         : DiffUtil.ItemCallback<User>() {
 
         override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
-            return oldItem == newItem
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {

@@ -11,7 +11,6 @@ import com.borlanddev.natife_finally.R
 import com.borlanddev.natife_finally.adapter.UserAdapter
 import com.borlanddev.natife_finally.databinding.FragmentListUsersBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -28,7 +27,7 @@ class ListUsersFragment : Fragment(R.layout.fragment_list_users) {
             findNavController().navigate(R.id.action_listUsersFragment_to_chatFragment)
         })
 
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+        lifecycleScope.launch {
             listUsersVM.users.collect {
                 userAdapter.submitList(it)
             }

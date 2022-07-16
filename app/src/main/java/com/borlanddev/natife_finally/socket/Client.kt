@@ -1,8 +1,7 @@
 package com.borlanddev.natife_finally.socket
 
 import android.util.Log
-import com.borlanddev.natife_finally.helpers.TCP_PORT
-import com.borlanddev.natife_finally.helpers.UDP_PORT
+import com.borlanddev.natife_finally.helpers.*
 import com.borlanddev.natife_finally.model.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
@@ -22,7 +21,6 @@ import javax.inject.Singleton
 class Client @Inject constructor() {
 
     private val gson = Gson()
-    private val timeout = 20_000
     private var username = ""
     private var clientID = ""
     private var pingPong: Job? = null
@@ -37,18 +35,18 @@ class Client @Inject constructor() {
     val listUsers: SharedFlow<List<User>> = listUsersFlow
     private val scope = CoroutineScope(Job() + Dispatchers.IO)
 
-    fun getToConnection(newName: String) {
+    fun connect(name: String) {
         scope.launch(Dispatchers.IO) {
             var clientIP = ""
             val udpSocket = DatagramSocket()
-            udpSocket.soTimeout = timeout
-            username = newName
+            udpSocket.soTimeout = TO_DISCONNECT_TIME_OUT
+            username = name
 
             try {
                 val message = ByteArray(1024)
                 val packet = DatagramPacket(
                     message, message.size,
-                    InetAddress.getByName("255.255.255.255"), UDP_PORT
+                    InetAddress.getByName(LOCAL_HOST), UDP_PORT
                 )
                 val message2 = ByteArray(1024)
                 val answer = DatagramPacket(
@@ -75,13 +73,12 @@ class Client @Inject constructor() {
 
     private fun tcpConnect(clientIP: String) {
         socket = Socket(clientIP, TCP_PORT)
-        socket?.soTimeout = timeout
-
-        connect.value = true
+        socket?.soTimeout = TO_DISCONNECT_TIME_OUT
 
         reader = BufferedReader(InputStreamReader(socket?.getInputStream()))
         writer = PrintWriter(OutputStreamWriter(socket?.getOutputStream()))
 
+        connect.value = true
         listeningServerResponse()
     }
 
@@ -150,12 +147,12 @@ class Client @Inject constructor() {
             while (connect.value) {
                 try {
                     pingPong = launch {
-                        delay(10_000)
+                        delay(PING_PONG_TIME_OUT)
                         disconnect()
                     }
                     writer?.println(dto)
                     writer?.flush()
-                    delay(7_000)
+                    delay(PING_TIME_OUT)
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }

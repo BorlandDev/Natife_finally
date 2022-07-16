@@ -1,6 +1,7 @@
 package com.borlanddev.natife_finally.ui.list_users
 
 import androidx.lifecycle.ViewModel
+import com.borlanddev.natife_finally.helpers.DEFAULT_NAME_PREFS
 import com.borlanddev.natife_finally.helpers.Prefs
 import com.borlanddev.natife_finally.socket.Client
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,8 +29,7 @@ class ListUsersVM @Inject constructor(
     }
 
     fun logOut() {
-        prefs.deleteUsername()
+        prefs.putUsername(DEFAULT_NAME_PREFS)
         client.disconnect()
     }
-
 }

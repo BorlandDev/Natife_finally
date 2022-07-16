@@ -10,7 +10,6 @@ import androidx.navigation.fragment.findNavController
 import com.borlanddev.natife_finally.R
 import com.borlanddev.natife_finally.databinding.FragmentAuthorizationBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -24,8 +23,8 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
         binding = FragmentAuthorizationBinding.bind(view)
 
         if (authorizationVM.isSignedIn()) {
-            authorizationVM.authorization()
-            isSignedIn()
+            authorizationVM.authorization(authorizationVM.getSavedName())
+            waitingForConnection()
         }
 
         binding?.signUpButton?.setOnClickListener {
@@ -39,20 +38,20 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
                 toast.show()
             } else {
                 authorizationVM.authorization(username)
-                isSignedIn()
+                waitingForConnection()
             }
         }
     }
 
-    private fun isSignedIn() {
+    private fun waitingForConnection() {
         binding?.apply {
             progressBar.visibility = View.VISIBLE
             signUpButton.isEnabled = false
             singInTextInput.isEnabled = false
         }
 
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-            authorizationVM.singedInVM.collect {
+        viewLifecycleOwner.lifecycleScope.launch {
+            authorizationVM.singedIn.collect {
                 if (it) {
                     goToListUsers()
                 }
@@ -71,6 +70,7 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
 
 
 }
+
 
 
 
