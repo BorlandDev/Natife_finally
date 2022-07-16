@@ -10,8 +10,8 @@
 
     <ImageView
         android:id="@+id/image_list_user"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="6dp"
         android:contentDescription="@string/user_image_description"
@@ -26,7 +26,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="4dp"
         android:ellipsize="end"
         android:lines="1"
         android:textColor="@color/black"
@@ -34,6 +34,20 @@
         app:layout_constraintStart_toEndOf="@id/image_list_user"
         app:layout_constraintTop_toTopOf="@id/image_list_user"
         tools:text="Maxim Boyko" />
+
+    <TextView
+        android:id="@+id/online_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:textColor="@color/black"
+        android:textSize="12sp"
+        app:layout_constraintTop_toBottomOf="@id/userNameTextView"
+        app:layout_constraintStart_toEndOf="@id/image_list_user"
+        tools:text="Online" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,7 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.borlanddev.natife_finally.R
-import com.borlanddev.natife_finally.adapter.UserAdapter
+import com.borlanddev.natife_finally.adapters.UserAdapter
 import com.borlanddev.natife_finally.databinding.FragmentListUsersBinding
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint

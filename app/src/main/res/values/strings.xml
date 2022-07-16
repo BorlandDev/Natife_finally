@@ -3,10 +3,12 @@
     <string name="hint_name">Please enter your name:</string>
     <string name="authorization_button">Log in</string>
     <string name="wrong_authorization">Error: username must not be empty</string>
+    <string name="wrong_sending_message">Error: message must not be empty</string>
     <string name="log_out_button">Log out</string>
     <string name="user_image_description">User</string>
     <string name="default_message">Default message</string>
     <string name="enter_your_message_hint">Enter your message</string>
     <string name="from">From:</string>
     <string name="send_message_button">Send message</string>
+    <string name="content_description_send_message_button">Send message</string>
 </resources>

@@ -33,8 +33,10 @@ class Client @Inject constructor() {
     val singedIn: SharedFlow<Boolean> = singedInFlow
     private val listUsersFlow = MutableSharedFlow<List<User>>()
     val listUsers: SharedFlow<List<User>> = listUsersFlow
-    private val messageFlow = MutableSharedFlow<MessageDto>()
-    val message: SharedFlow<MessageDto> = messageFlow
+    private val sendMessageFlow = MutableSharedFlow<SendMessageDto>()
+    val sendMessage: SharedFlow<SendMessageDto> = sendMessageFlow
+    private val newMessageFlow = MutableSharedFlow<MessageDto>()
+    val newMessage: SharedFlow<MessageDto> = newMessageFlow
     private val scope = CoroutineScope(Job() + Dispatchers.IO)
 
     fun connect(name: String) {
@@ -118,8 +120,17 @@ class Client @Inject constructor() {
                                 pingPong?.cancel()
                             }
 
+                            BaseDto.Action.SEND_MESSAGE -> {
+                                sendMessageFlow.emit(
+                                    gson.fromJson(
+                                        result.payload,
+                                        SendMessageDto::class.java
+                                    )
+                                )
+                            }
+
                             BaseDto.Action.NEW_MESSAGE -> {
-                                messageFlow.emit(
+                                newMessageFlow.emit(
                                     gson.fromJson(
                                         result.payload,
                                         MessageDto::class.java

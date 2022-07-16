@@ -1,4 +1,4 @@
-package com.borlanddev.natife_finally.adapter
+package com.borlanddev.natife_finally.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
