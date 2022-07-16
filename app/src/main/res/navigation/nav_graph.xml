@@ -11,7 +11,11 @@
         tools:layout="@layout/fragment_authorization" >
         <action
             android:id="@+id/action_authorizationFragment_to_listUsersFragment"
-            app:destination="@id/listUsersFragment" />
+            app:destination="@id/listUsersFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit" />
     </fragment>
     <fragment
         android:id="@+id/listUsersFragment"
@@ -20,11 +24,21 @@
         tools:layout="@layout/fragment_list_users" >
         <action
             android:id="@+id/action_listUsersFragment_to_chatFragment"
-            app:destination="@id/chatFragment" />
+            app:destination="@id/chatFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit" />
         <action
             android:id="@+id/action_listUsersFragment_to_authorizationFragment"
-            app:destination="@id/authorizationFragment" />
+            app:destination="@id/authorizationFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit" />
+
     </fragment>
+
     <fragment
         android:id="@+id/chatFragment"
         android:name="com.borlanddev.natife_finally.ui.chat.ChatFragment"
@@ -32,6 +46,13 @@
         tools:layout="@layout/fragment_chat" >
         <action
             android:id="@+id/action_chatFragment_to_listUsersFragment"
-            app:destination="@id/listUsersFragment" />
+            app:destination="@id/listUsersFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit" />
+        <argument
+            android:name="recipientID"
+            app:argType="string" />
     </fragment>
 </navigation>

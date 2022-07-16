@@ -27,18 +27,20 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
             waitingForConnection()
         }
 
-        binding?.signUpButton?.setOnClickListener {
-            val username = binding?.singInTextInput?.text.toString()
-            if (username.isEmpty()) {
-                val toast = Toast.makeText(
-                    requireContext(),
-                    R.string.wrong_authorization,
-                    Toast.LENGTH_SHORT
-                )
-                toast.show()
-            } else {
-                authorizationVM.authorization(username)
-                waitingForConnection()
+        binding?.apply {
+            signUpButton.setOnClickListener {
+                val username = singInTextInput.text.toString()
+                if (username.isEmpty()) {
+                    val toast = Toast.makeText(
+                        requireContext(),
+                        R.string.wrong_authorization,
+                        Toast.LENGTH_SHORT
+                    )
+                    toast.show()
+                } else {
+                    authorizationVM.authorization(username)
+                    waitingForConnection()
+                }
             }
         }
     }

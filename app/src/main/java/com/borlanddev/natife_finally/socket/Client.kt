@@ -33,6 +33,8 @@ class Client @Inject constructor() {
     val singedIn: SharedFlow<Boolean> = singedInFlow
     private val listUsersFlow = MutableSharedFlow<List<User>>()
     val listUsers: SharedFlow<List<User>> = listUsersFlow
+    private val messageFlow = MutableSharedFlow<MessageDto>()
+    val message: SharedFlow<MessageDto> = messageFlow
     private val scope = CoroutineScope(Job() + Dispatchers.IO)
 
     fun connect(name: String) {
@@ -117,13 +119,11 @@ class Client @Inject constructor() {
                             }
 
                             BaseDto.Action.NEW_MESSAGE -> {
-                                val dto = gson.fromJson(
-                                    result.payload,
-                                    MessageDto::class.java
-                                )
-                                Log.d(
-                                    "Client_NEW_MESSAGE",
-                                    "Message from: ${dto.from} \n ${dto.message}"
+                                messageFlow.emit(
+                                    gson.fromJson(
+                                        result.payload,
+                                        MessageDto::class.java
+                                    )
                                 )
                             }
                             else -> Log.d("Client_null", "")
@@ -186,6 +186,23 @@ class Client @Inject constructor() {
                     BaseDto(
                         BaseDto.Action.GET_USERS,
                         gson.toJson(GetUsersDto(clientID))
+                    )
+                )
+                writer?.println(dto)
+                writer?.flush()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun sendMessage(message: String, recipientID: String) {
+        scope.launch(Dispatchers.IO) {
+            try {
+                val dto = gson.toJson(
+                    BaseDto(
+                        BaseDto.Action.SEND_MESSAGE,
+                        gson.toJson(SendMessageDto(clientID, recipientID, message))
                     )
                 )
                 writer?.println(dto)

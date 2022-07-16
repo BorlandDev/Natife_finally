@@ -8,3 +8,4 @@ const val PING_PONG_TIME_OUT = 10_000L
 const val LOCAL_HOST = "255.255.255.255"
 const val DEFAULT_NAME_PREFS = "empty name"
 const val USERNAME_KEY_PREFS = DEFAULT_NAME_PREFS
+const val KEY_FOR_RECIPIENT_ID = "Key for recipient id"

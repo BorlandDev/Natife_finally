@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.borlanddev.natife_finally.R
 import com.borlanddev.natife_finally.adapter.UserAdapter
 import com.borlanddev.natife_finally.databinding.FragmentListUsersBinding
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -24,7 +25,9 @@ class ListUsersFragment : Fragment(R.layout.fragment_list_users) {
         binding = FragmentListUsersBinding.bind(view)
 
         val userAdapter = UserAdapter(onItemClick = {
-            findNavController().navigate(R.id.action_listUsersFragment_to_chatFragment)
+            val id = Gson().fromJson(it.id, String::class.java)
+            val direction = ListUsersFragmentDirections.actionListUsersFragmentToChatFragment(id)
+            findNavController().navigate(direction)
         })
 
         lifecycleScope.launch {

@@ -5,4 +5,8 @@
     <string name="wrong_authorization">Error: username must not be empty</string>
     <string name="log_out_button">Log out</string>
     <string name="user_image_description">User</string>
+    <string name="default_message">Default message</string>
+    <string name="enter_your_message_hint">Enter your message</string>
+    <string name="from">From:</string>
+    <string name="send_message_button">Send message</string>
 </resources>
