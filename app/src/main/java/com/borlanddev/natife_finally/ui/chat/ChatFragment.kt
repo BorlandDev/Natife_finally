@@ -41,12 +41,8 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 } else {
                     chatVM.sendMessage(message, recipientID)
                     editText.text.clear()
-                }
-            }
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                chatVM.sendMessage.collect {
-                    chatAdapter.sendMessage(it, chatVM.getUsername())
+                    chatAdapter.sendMessage(message, chatVM.getUsername())
                 }
             }
 
@@ -55,8 +51,6 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                     chatAdapter.newMessage(it)
                 }
             }
-
-
 
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = chatAdapter
