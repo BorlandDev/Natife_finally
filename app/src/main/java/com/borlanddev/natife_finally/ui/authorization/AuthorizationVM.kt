@@ -27,6 +27,6 @@ class AuthorizationVM @Inject constructor(
         }
     }
 
-    fun isSignedIn(): Boolean = prefs.getUsername() != DEFAULT_NAME_PREFS
     fun getSavedName(): String = prefs.getUsername()
+    fun isSignedIn(): Boolean = prefs.getUsername() != DEFAULT_NAME_PREFS
 }

@@ -69,8 +69,6 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
         }
         findNavController().navigate(R.id.action_authorizationFragment_to_listUsersFragment)
     }
-
-
 }
 
 

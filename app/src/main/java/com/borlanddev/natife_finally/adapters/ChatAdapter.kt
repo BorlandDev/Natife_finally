@@ -11,7 +11,6 @@ import com.borlanddev.natife_finally.model.MessageDto
 class ChatAdapter : RecyclerView.Adapter<ChatAdapter.ChatHolder>() {
 
     private val listMessage = mutableListOf<Any>()
-
     private var currentUsername: String = DEFAULT_NAME_PREFS
 
     class ChatHolder(private val binding: ViewChatBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -46,16 +45,13 @@ class ChatAdapter : RecyclerView.Adapter<ChatAdapter.ChatHolder>() {
     override fun getItemCount(): Int = listMessage.size
 
     override fun onBindViewHolder(holder: ChatHolder, position: Int) {
-        val item = listMessage[position]
-
-        when (item) {
+        when (val item = listMessage[position]) {
             is String -> holder.bindToUser(item, currentUsername)
             is MessageDto -> holder.bindToRecipient(item)
         }
     }
 
-
-    fun sendMessage(sendMessage: String, username: String) {
+    fun sentMessage(sendMessage: String, username: String) {
         currentUsername = username
         listMessage.add(sendMessage)
         notifyDataSetChanged()

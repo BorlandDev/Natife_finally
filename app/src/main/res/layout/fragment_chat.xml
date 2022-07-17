@@ -7,7 +7,6 @@
     android:background="@drawable/background_chat"
     tools:context=".ui.chat.ChatFragment">
 
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
@@ -21,10 +20,10 @@
         android:id="@+id/edit_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
         android:hint="@string/enter_your_message_hint"
         android:inputType="text"
         android:padding="8dp"
-        android:layout_marginBottom="12dp"
         android:textColor="@color/black"
         android:textColorHint="@color/gray_600"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -35,12 +34,12 @@
         android:id="@+id/send_message_button"
         android:layout_width="70dp"
         android:layout_height="0dp"
-        android:padding="8dp"
         android:layout_marginBottom="4dp"
+        android:contentDescription="@string/content_description_send_message_button"
+        android:padding="8dp"
         android:src="@drawable/baseline_send_black_36"
         android:text="@string/send_message_button"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="@string/content_description_send_message_button" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

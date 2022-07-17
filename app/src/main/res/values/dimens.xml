@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="medium_space">12dp</dimen>
+    <dimen name="avatar_size">52dp</dimen>
+    <dimen name="message_text_view_padding">8dp</dimen>
+
 </resources>

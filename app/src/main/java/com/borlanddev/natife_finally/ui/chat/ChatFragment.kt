@@ -42,7 +42,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                     chatVM.sendMessage(message, recipientID)
                     editText.text.clear()
 
-                    chatAdapter.sendMessage(message, chatVM.getUsername())
+                    chatAdapter.sentMessage(message, chatVM.getUsername())
                 }
             }
 

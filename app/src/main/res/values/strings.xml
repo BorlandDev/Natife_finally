@@ -11,4 +11,5 @@
     <string name="from">From:</string>
     <string name="send_message_button">Send message</string>
     <string name="content_description_send_message_button">Send message</string>
+    <string name="online_text_view">Online</string>
 </resources>

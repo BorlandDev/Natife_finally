@@ -21,7 +21,7 @@ import javax.inject.Singleton
 class Client @Inject constructor() {
 
     private val gson = Gson()
-    private var username = ""
+    private var username = DEFAULT_NAME_PREFS
     private var clientID = ""
     private var pingPong: Job? = null
     private var socket: Socket? = null
@@ -33,8 +33,6 @@ class Client @Inject constructor() {
     val singedIn: SharedFlow<Boolean> = singedInFlow
     private val listUsersFlow = MutableSharedFlow<List<User>>()
     val listUsers: SharedFlow<List<User>> = listUsersFlow
-    private val sendMessageFlow = MutableSharedFlow<SendMessageDto>()
-    val sendMessage: SharedFlow<SendMessageDto> = sendMessageFlow
     private val newMessageFlow = MutableSharedFlow<MessageDto>()
     val newMessage: SharedFlow<MessageDto> = newMessageFlow
     private val scope = CoroutineScope(Job() + Dispatchers.IO)
@@ -118,15 +116,6 @@ class Client @Inject constructor() {
 
                             BaseDto.Action.PONG -> {
                                 pingPong?.cancel()
-                            }
-
-                            BaseDto.Action.SEND_MESSAGE -> {
-                                sendMessageFlow.emit(
-                                    gson.fromJson(
-                                        result.payload,
-                                        SendMessageDto::class.java
-                                    )
-                                )
                             }
 
                             BaseDto.Action.NEW_MESSAGE -> {
@@ -235,13 +224,11 @@ class Client @Inject constructor() {
                 )
                 writer?.println(dto)
                 writer?.flush()
-
-                connect.value = false
-                singedInFlow.emit(false)
                 reader?.close()
                 socket?.close()
                 writer?.close()
-
+                connect.value = false
+                singedInFlow.emit(false)
                 scope.coroutineContext.job.cancelChildren()
             } catch (e: IOException) {
                 e.printStackTrace()

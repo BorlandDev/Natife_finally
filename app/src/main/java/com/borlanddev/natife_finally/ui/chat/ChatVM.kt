@@ -12,7 +12,6 @@ class ChatVM @Inject constructor(
     private val prefs: Prefs
 ) : ViewModel() {
 
-    val sendMessage = client.sendMessage
     val newMessage = client.newMessage
 
     fun sendMessage(message: String, recipientID: String) {
