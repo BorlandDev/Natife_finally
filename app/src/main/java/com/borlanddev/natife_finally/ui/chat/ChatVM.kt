@@ -18,6 +18,7 @@ class ChatVM @Inject constructor(
 ) : ViewModel() {
 
     private var list = listOf<MessageDto>()
+    private val clientId = client.getClientId()
     private val username: String by lazy { prefs.getUsername() }
 
     private val listMessageFlow = MutableSharedFlow<List<MessageDto>>()
@@ -32,13 +33,12 @@ class ChatVM @Inject constructor(
         receiveClientMessages(message)
     }
 
-    fun checkSender(messageDto: MessageDto): Boolean = messageDto.from.id == client.getClientId()
-
+    fun checkSender(messageDto: MessageDto): Boolean = messageDto.from.id == clientId
 
     private fun receiveClientMessages(clientMessage: String) {
         val messageDto = MessageDto(
             User(
-                client.getClientId(),
+                clientId,
                 username
             ), clientMessage
         )

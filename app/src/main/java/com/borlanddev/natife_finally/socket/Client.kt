@@ -22,13 +22,13 @@ class Client @Inject constructor() {
 
     private val gson = Gson()
     private var clientID = ""
+    private var username = DEFAULT_NAME_PREFS
     private var pingPong: Job? = null
     private var socket: Socket? = null
     private var response: String? = null
     private var writer: PrintWriter? = null
     private var reader: BufferedReader? = null
     private var connect = MutableStateFlow(false)
-    private var username = DEFAULT_NAME_PREFS
     private val singedInFlow = MutableSharedFlow<Boolean>()
     val singedIn: SharedFlow<Boolean> = singedInFlow
     private val listUsersFlow = MutableSharedFlow<List<User>>()
