@@ -6,13 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
-    >
+    android:padding="8dp">
 
     <LinearLayout
         android:id="@+id/client_message_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
         android:background="@drawable/background_client_message"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,6 +26,7 @@
             android:paddingBottom="4dp"
             android:textColor="@color/gray_600"
             android:textSize="12sp"
+            android:layout_gravity="end"
             app:layout_constraintBottom_toTopOf="@id/client_message"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
