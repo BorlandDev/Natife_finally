@@ -22,7 +22,6 @@ class Client @Inject constructor() {
 
     private val gson = Gson()
     private var clientID = ""
-    val clientId = clientID
     private var pingPong: Job? = null
     private var socket: Socket? = null
     private var response: String? = null
@@ -36,7 +35,6 @@ class Client @Inject constructor() {
     val listUsers: SharedFlow<List<User>> = listUsersFlow
     private val newMessageFlow = MutableSharedFlow<MessageDto>()
     val newMessage: SharedFlow<MessageDto> = newMessageFlow
-
     private val scope = CoroutineScope(Job() + Dispatchers.IO)
 
     fun connect(name: String) {
@@ -75,6 +73,8 @@ class Client @Inject constructor() {
         }
     }
 
+    fun getClientId() = clientID
+
     private fun tcpConnect(serverIP: String) {
         socket = Socket(serverIP, TCP_PORT)
         socket?.soTimeout = TO_DISCONNECT_TIME_OUT
@@ -85,7 +85,6 @@ class Client @Inject constructor() {
         connect.value = true
         listeningServerResponse()
     }
-
 
     private fun listeningServerResponse() {
         scope.launch(Dispatchers.IO) {

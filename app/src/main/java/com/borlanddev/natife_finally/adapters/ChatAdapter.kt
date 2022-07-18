@@ -9,15 +9,17 @@ import com.borlanddev.natife_finally.databinding.ClientMessageLayoutBinding
 import com.borlanddev.natife_finally.databinding.RecipientMesageLayoutBinding
 import com.borlanddev.natife_finally.model.MessageDto
 
-class ChatAdapter(private val clientID: String) :
+class ChatAdapter(private val checkID: (MessageDto) -> Boolean) :
     ListAdapter<MessageDto, RecyclerView.ViewHolder>(MessageDiffCallback()) {
 
-    override fun getItemViewType(position: Int): Int =
-        if (getItem(position).from.id == clientID) {
+    override fun getItemViewType(position: Int): Int {
+        val messageDto = getItem(position)
+        return if (checkID.invoke(messageDto)) {
             CLIENT_VIEW_TYPE
         } else {
             RECIPIENT_VIEW_TYPE
         }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
@@ -29,17 +31,10 @@ class ChatAdapter(private val clientID: String) :
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (getItemViewType(position)) {
-            CLIENT_VIEW_TYPE -> {
-                val clientHolder = holder as ClientHolder
-                val messageDto = getItem(position)
-                clientHolder.bind(messageDto)
-            }
-
-            RECIPIENT_VIEW_TYPE -> {
-                val recipientHolder = holder as RecipientHolder
-                val messageDto = getItem(position)
-                recipientHolder.bind(messageDto)
-            }
+            CLIENT_VIEW_TYPE ->
+                (holder as? ClientHolder)?.bind(getItem(position))
+            RECIPIENT_VIEW_TYPE ->
+                (holder as? RecipientHolder)?.bind(getItem(position))
         }
     }
 
@@ -59,7 +54,7 @@ class ChatAdapter(private val clientID: String) :
 
         fun bind(messageDto: MessageDto) {
             binding.apply {
-                recipientFrom.text= messageDto.from.name
+                recipientFrom.text = messageDto.from.name
                 recipientMessage.text = messageDto.message
             }
         }

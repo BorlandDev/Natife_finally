@@ -32,7 +32,9 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentChatBinding.bind(view)
 
-        val chatAdapter = ChatAdapter(chatVM.clientId)
+        val chatAdapter = ChatAdapter {
+            chatVM.checkSender(it)
+        }
 
         binding?.apply {
             sendMessageButton.setOnClickListener {
@@ -52,7 +54,6 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
             lifecycleScope.launch {
                 chatVM.listMessage.collect {
-                    chatAdapter.notifyDataSetChanged()
                     chatAdapter.submitList(it)
                 }
             }
