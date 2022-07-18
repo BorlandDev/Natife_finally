@@ -49,7 +49,7 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
 
     private fun waitingForConnection() {
         binding?.apply {
-            progressBar.isVisible
+            progressBar.isVisible = true
             signUpButton.isEnabled = false
             singInTextInput.isEnabled = false
         }
@@ -65,7 +65,7 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
 
     private fun goToListUsers() {
         binding?.apply {
-            progressBar.isInvisible
+            progressBar.isInvisible = true
             signUpButton.isEnabled = true
             singInTextInput.isEnabled = true
         }

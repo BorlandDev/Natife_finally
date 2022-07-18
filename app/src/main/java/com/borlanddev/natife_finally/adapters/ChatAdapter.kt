@@ -59,7 +59,7 @@ class ChatAdapter(private val clientID: String) :
 
         fun bind(messageDto: MessageDto) {
             binding.apply {
-                recipientFrom.text = messageDto.from.name
+                recipientFrom.text= messageDto.from.name
                 recipientMessage.text = messageDto.message
             }
         }

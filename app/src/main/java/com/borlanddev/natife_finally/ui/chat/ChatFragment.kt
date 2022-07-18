@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.borlanddev.natife_finally.R
 import com.borlanddev.natife_finally.adapters.ChatAdapter
 import com.borlanddev.natife_finally.databinding.FragmentChatBinding
-import com.borlanddev.natife_finally.model.MessageDto
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -51,11 +50,10 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 }
             }
 
-           lifecycleScope.launch {
-                chatVM.newMessage.collect {
-                    val messageList = mutableListOf<MessageDto>()
-                    messageList.add(it)
-                    chatAdapter.submitList(messageList)
+            lifecycleScope.launch {
+                chatVM.listMessage.collect {
+                    chatAdapter.notifyDataSetChanged()
+                    chatAdapter.submitList(it)
                 }
             }
             recyclerView.layoutManager = LinearLayoutManager(context)

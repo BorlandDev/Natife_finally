@@ -21,7 +21,6 @@ import javax.inject.Singleton
 class Client @Inject constructor() {
 
     private val gson = Gson()
-    private var username = DEFAULT_NAME_PREFS
     private var clientID = ""
     val clientId = clientID
     private var pingPong: Job? = null
@@ -30,12 +29,14 @@ class Client @Inject constructor() {
     private var writer: PrintWriter? = null
     private var reader: BufferedReader? = null
     private var connect = MutableStateFlow(false)
+    private var username = DEFAULT_NAME_PREFS
     private val singedInFlow = MutableSharedFlow<Boolean>()
     val singedIn: SharedFlow<Boolean> = singedInFlow
     private val listUsersFlow = MutableSharedFlow<List<User>>()
     val listUsers: SharedFlow<List<User>> = listUsersFlow
     private val newMessageFlow = MutableSharedFlow<MessageDto>()
     val newMessage: SharedFlow<MessageDto> = newMessageFlow
+
     private val scope = CoroutineScope(Job() + Dispatchers.IO)
 
     fun connect(name: String) {

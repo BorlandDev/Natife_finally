@@ -3,37 +3,44 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="end"
-    android:layout_margin="10dp"
-    android:layout_marginStart="100dp"
-    android:background="@drawable/background_user_message">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/client_from"
+    <LinearLayout
+        android:id="@+id/client_message_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/message_text_view_padding"
-        android:paddingEnd="@dimen/message_text_view_padding"
-        android:paddingBottom="4dp"
-        android:textColor="@color/gray_600"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@id/client_message"
+        android:layout_margin="10dp"
+        android:background="@drawable/background_client_message"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="@string/from" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/client_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="end"
-        android:paddingStart="@dimen/message_text_view_padding"
-        android:paddingEnd="@dimen/message_text_view_padding"
-        android:paddingBottom="@dimen/message_text_view_padding"
-        android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/client_from"
-        tools:text="@string/default_message" />
+        <TextView
+            android:id="@+id/client_from"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/message_text_view_padding"
+            android:paddingEnd="@dimen/message_text_view_padding"
+            android:paddingBottom="4dp"
+            android:textColor="@color/gray_600"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@id/client_message"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/from" />
+
+        <TextView
+            android:id="@+id/client_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:paddingStart="@dimen/message_text_view_padding"
+            android:paddingEnd="@dimen/message_text_view_padding"
+            android:paddingBottom="@dimen/message_text_view_padding"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/client_from"
+            tools:text="@string/default_message" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -37,7 +37,7 @@ class ListUsersFragment : Fragment(R.layout.fragment_list_users) {
         }
 
         binding?.apply {
-            progressBar.isInvisible
+            progressBar.isInvisible = true
             logOutButton.isEnabled = true
 
             recyclerView.layoutManager = LinearLayoutManager(context)
@@ -50,7 +50,7 @@ class ListUsersFragment : Fragment(R.layout.fragment_list_users) {
 
             logOutButton.setOnClickListener {
                 listUsersVM.logOut()
-                progressBar.isVisible
+                progressBar.isVisible = true
                 logOutButton.isEnabled = false
 
                 findNavController().navigate(R.id.action_listUsersFragment_to_authorizationFragment)
