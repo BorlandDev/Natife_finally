@@ -3,6 +3,8 @@ package com.borlanddev.natife_finally.ui.authorization
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -47,7 +49,7 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
 
     private fun waitingForConnection() {
         binding?.apply {
-            progressBar.visibility = View.VISIBLE
+            progressBar.isVisible
             signUpButton.isEnabled = false
             singInTextInput.isEnabled = false
         }
@@ -63,14 +65,10 @@ class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
 
     private fun goToListUsers() {
         binding?.apply {
-            progressBar.visibility = View.INVISIBLE
+            progressBar.isInvisible
             signUpButton.isEnabled = true
             singInTextInput.isEnabled = true
         }
         findNavController().navigate(R.id.action_authorizationFragment_to_listUsersFragment)
     }
 }
-
-
-
-
