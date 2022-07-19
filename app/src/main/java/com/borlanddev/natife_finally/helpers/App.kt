@@ -1,4 +1,4 @@
-package com.borlanddev.natife_finally.app
+package com.borlanddev.natife_finally.helpers
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

@@ -4,20 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/authorizationFragment">
-
     <fragment
         android:id="@+id/authorizationFragment"
         android:name="com.borlanddev.natife_finally.ui.authorization.AuthorizationFragment"
         android:label="Authorization"
-        tools:layout="@layout/fragment_authorization"
-        >
+        tools:layout="@layout/fragment_authorization" >
         <action
             android:id="@+id/action_authorizationFragment_to_listUsersFragment"
             app:destination="@id/listUsersFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit" />
     </fragment>
     <fragment
         android:id="@+id/listUsersFragment"
@@ -27,14 +25,34 @@
         <action
             android:id="@+id/action_listUsersFragment_to_chatFragment"
             app:destination="@id/chatFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit" />
+        <action
+            android:id="@+id/action_listUsersFragment_to_authorizationFragment"
+            app:destination="@id/authorizationFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit" />
+
     </fragment>
+
     <fragment
         android:id="@+id/chatFragment"
         android:name="com.borlanddev.natife_finally.ui.chat.ChatFragment"
         android:label="Chat"
-        tools:layout="@layout/fragment_chat" />
+        tools:layout="@layout/fragment_chat" >
+        <action
+            android:id="@+id/action_chatFragment_to_listUsersFragment"
+            app:destination="@id/listUsersFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit" />
+        <argument
+            android:name="recipientID"
+            app:argType="string" />
+    </fragment>
 </navigation>

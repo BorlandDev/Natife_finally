@@ -1,8 +1,35 @@
 package com.borlanddev.natife_finally.ui.list_users
 
 import androidx.lifecycle.ViewModel
+import com.borlanddev.natife_finally.helpers.DEFAULT_NAME_PREFS
+import com.borlanddev.natife_finally.helpers.Prefs
+import com.borlanddev.natife_finally.socket.Client
+import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.IOException
+import javax.inject.Inject
 
-class ListUsersVM(
+@HiltViewModel
+class ListUsersVM @Inject constructor(
+    private val client: Client,
+    private val prefs: Prefs
+) : ViewModel() {
 
-): ViewModel() {
+    val users = client.listUsers
+
+    init {
+        getUsers()
+    }
+
+    fun getUsers() {
+        try {
+            client.getUsers()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    fun logOut() {
+        prefs.putUsername(DEFAULT_NAME_PREFS)
+        client.disconnect()
+    }
 }
