@@ -1,4 +1,4 @@
-package com.borlanddev.natife_finally.model
+package com.borlanddev.data.model
 
 data class BaseDto(val action: Action, val payload: String) {
 

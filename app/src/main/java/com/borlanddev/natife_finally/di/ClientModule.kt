@@ -1,6 +1,6 @@
 package com.borlanddev.natife_finally.di
 
-import com.borlanddev.natife_finally.socket.Client
+import com.borlanddev.data.socket.Client
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

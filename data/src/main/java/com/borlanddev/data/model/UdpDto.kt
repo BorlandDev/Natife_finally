@@ -1,3 +1,3 @@
-package com.borlanddev.natife_finally.model
+package com.borlanddev.data.model
 
 data class UdpDto(val ip: String) : Payload

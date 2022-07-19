@@ -1,8 +1,8 @@
-package com.borlanddev.natife_finally.socket
+package com.borlanddev.data.socket
 
 import android.util.Log
-import com.borlanddev.natife_finally.helpers.*
-import com.borlanddev.natife_finally.model.*
+import com.borlanddev.data.consts.*
+import com.borlanddev.data.model.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,7 +22,7 @@ class Client @Inject constructor() {
 
     private val gson = Gson()
     private var clientID = ""
-    private var username = DEFAULT_NAME_PREFS
+    private var userName = DEFAULT_NAME_PREFS
     private var pingPong: Job? = null
     private var socket: Socket? = null
     private var response: String? = null
@@ -42,7 +42,7 @@ class Client @Inject constructor() {
             var serverIP = ""
             val udpSocket = DatagramSocket()
             udpSocket.soTimeout = TO_DISCONNECT_TIME_OUT
-            username = name
+            userName = name
 
             try {
                 val message = ByteArray(1024)
@@ -103,7 +103,7 @@ class Client @Inject constructor() {
                                 ).id
 
                                 sendPing()
-                                sendConnect(username)
+                                sendConnect(userName)
                             }
 
                             BaseDto.Action.USERS_RECEIVED -> {

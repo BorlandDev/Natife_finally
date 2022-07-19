@@ -2,7 +2,7 @@ package com.borlanddev.natife_finally.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.borlanddev.natife_finally.helpers.USERNAME_KEY_PREFS
+import com.borlanddev.data.consts.USERNAME_KEY_PREFS
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

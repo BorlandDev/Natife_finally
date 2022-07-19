@@ -1,4 +1,4 @@
-package com.borlanddev.natife_finally.helpers
+package com.borlanddev.data.consts
 
 const val UDP_PORT = 8888
 const val TCP_PORT = 6666

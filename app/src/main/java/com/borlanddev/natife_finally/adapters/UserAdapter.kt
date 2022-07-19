@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.borlanddev.natife_finally.databinding.ListUsersBinding
-import com.borlanddev.natife_finally.model.User
+import com.borlanddev.data.model.User
 
 class UserAdapter(private var onItemClick: (User) -> Unit) :
     ListAdapter<User, UserAdapter.UserHolder>(UsersDiffCallback()) {
