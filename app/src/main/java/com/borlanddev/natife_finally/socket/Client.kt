@@ -21,8 +21,8 @@ import javax.inject.Singleton
 class Client @Inject constructor() {
 
     private val gson = Gson()
-    private var username = DEFAULT_NAME_PREFS
     private var clientID = ""
+    private var username = DEFAULT_NAME_PREFS
     private var pingPong: Job? = null
     private var socket: Socket? = null
     private var response: String? = null
@@ -39,7 +39,7 @@ class Client @Inject constructor() {
 
     fun connect(name: String) {
         scope.launch(Dispatchers.IO) {
-            var clientIP = ""
+            var serverIP = ""
             val udpSocket = DatagramSocket()
             udpSocket.soTimeout = TO_DISCONNECT_TIME_OUT
             username = name
@@ -54,17 +54,17 @@ class Client @Inject constructor() {
                 val answer = DatagramPacket(
                     message2, message2.size
                 )
-                while (clientIP.isEmpty()) {
+                while (serverIP.isEmpty()) {
                     try {
                         udpSocket.send(packet)
                         udpSocket.receive(answer)
-                        clientIP = answer.address.hostName
-                        Log.d("Client_clientIP", clientIP)
+                        serverIP = answer.address.hostName
+                        Log.d("Client_clientIP", serverIP)
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
                 }
-                tcpConnect(clientIP)
+                tcpConnect(serverIP)
             } catch (e: IOException) {
                 e.printStackTrace()
             } finally {
@@ -73,8 +73,10 @@ class Client @Inject constructor() {
         }
     }
 
-    private fun tcpConnect(clientIP: String) {
-        socket = Socket(clientIP, TCP_PORT)
+    fun getClientId() = clientID
+
+    private fun tcpConnect(serverIP: String) {
+        socket = Socket(serverIP, TCP_PORT)
         socket?.soTimeout = TO_DISCONNECT_TIME_OUT
 
         reader = BufferedReader(InputStreamReader(socket?.getInputStream()))
@@ -83,7 +85,6 @@ class Client @Inject constructor() {
         connect.value = true
         listeningServerResponse()
     }
-
 
     private fun listeningServerResponse() {
         scope.launch(Dispatchers.IO) {

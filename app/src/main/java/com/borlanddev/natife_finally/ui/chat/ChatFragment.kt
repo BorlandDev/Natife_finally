@@ -13,20 +13,28 @@ import com.borlanddev.natife_finally.adapters.ChatAdapter
 import com.borlanddev.natife_finally.databinding.FragmentChatBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChatFragment : Fragment(R.layout.fragment_chat) {
 
     private var binding: FragmentChatBinding? = null
-    private val chatVM: ChatVM by viewModels()
     private val args: ChatFragmentArgs by navArgs()
+
+    @Inject
+    lateinit var factory: ChatVmFactory.Factory
+
+    private val chatVM: ChatVM by viewModels {
+        factory.create(args.recipientID)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentChatBinding.bind(view)
 
-        val recipientID = args.recipientID
-        val chatAdapter = ChatAdapter()
+        val chatAdapter = ChatAdapter {
+            chatVM.checkSender(it)
+        }
 
         binding?.apply {
             sendMessageButton.setOnClickListener {
@@ -39,19 +47,16 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                     )
                     toast.show()
                 } else {
-                    chatVM.sendMessage(message, recipientID)
+                    chatVM.sendMessage(message)
                     editText.text.clear()
-
-                    chatAdapter.sentMessage(message, chatVM.getUsername())
                 }
             }
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                chatVM.newMessage.collect {
-                    chatAdapter.newMessage(it)
+            lifecycleScope.launch {
+                chatVM.listMessage.collect {
+                    chatAdapter.submitList(it)
                 }
             }
-
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = chatAdapter
         }

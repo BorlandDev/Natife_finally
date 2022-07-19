@@ -1,65 +1,100 @@
 package com.borlanddev.natife_finally.adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.borlanddev.natife_finally.databinding.ViewChatBinding
-import com.borlanddev.natife_finally.helpers.DEFAULT_NAME_PREFS
+import com.borlanddev.natife_finally.databinding.ClientMessageLayoutBinding
+import com.borlanddev.natife_finally.databinding.RecipientMesageLayoutBinding
 import com.borlanddev.natife_finally.model.MessageDto
 
-class ChatAdapter : RecyclerView.Adapter<ChatAdapter.ChatHolder>() {
+class ChatAdapter(private val checkID: (MessageDto) -> Boolean) :
+    ListAdapter<MessageDto, RecyclerView.ViewHolder>(MessageDiffCallback()) {
 
-    private val listMessage = mutableListOf<Any>()
-    private var currentUsername: String = DEFAULT_NAME_PREFS
+    override fun getItemViewType(position: Int): Int {
+        val messageDto = getItem(position)
+        return if (checkID.invoke(messageDto)) {
+            CLIENT_VIEW_TYPE
+        } else {
+            RECIPIENT_VIEW_TYPE
+        }
+    }
 
-    class ChatHolder(private val binding: ViewChatBinding) : RecyclerView.ViewHolder(binding.root) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            CLIENT_VIEW_TYPE -> createClientHolder(parent)
+            RECIPIENT_VIEW_TYPE -> createRecipientHolder(parent)
+            else -> throw IllegalStateException()
+        }
+    }
 
-        fun bindToUser(sendMessage: String, currentUsername: String) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (getItemViewType(position)) {
+            CLIENT_VIEW_TYPE ->
+                (holder as? ClientHolder)?.bind(getItem(position))
+            RECIPIENT_VIEW_TYPE ->
+                (holder as? RecipientHolder)?.bind(getItem(position))
+        }
+    }
+
+    class ClientHolder(private val binding: ClientMessageLayoutBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(messageDto: MessageDto) {
             binding.apply {
-                userMessageLayout.visibility = View.VISIBLE
-                recipientMessageLayout.visibility = View.INVISIBLE
-
-                userFrom.text = currentUsername
-                chatUserMessage.text = sendMessage
+                clientFrom.text = messageDto.from.name
+                clientMessage.text = messageDto.message
             }
         }
+    }
 
-        fun bindToRecipient(messageDto: MessageDto) {
+    class RecipientHolder(private val binding: RecipientMesageLayoutBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(messageDto: MessageDto) {
             binding.apply {
-                recipientMessageLayout.visibility = View.VISIBLE
-                userMessageLayout.visibility = View.INVISIBLE
-
                 recipientFrom.text = messageDto.from.name
-                chatRecipientMessage.text = messageDto.message
+                recipientMessage.text = messageDto.message
             }
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val binding = ViewChatBinding.inflate(inflater, parent, false)
-        return ChatHolder(binding)
-    }
+    companion object {
 
-    override fun getItemCount(): Int = listMessage.size
+        const val CLIENT_VIEW_TYPE = 0
+        const val RECIPIENT_VIEW_TYPE = 1
 
-    override fun onBindViewHolder(holder: ChatHolder, position: Int) {
-        when (val item = listMessage[position]) {
-            is String -> holder.bindToUser(item, currentUsername)
-            is MessageDto -> holder.bindToRecipient(item)
+        fun createClientHolder(parent: ViewGroup): ClientHolder {
+            return ClientHolder(
+                ClientMessageLayoutBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+        }
+
+        fun createRecipientHolder(parent: ViewGroup): RecipientHolder {
+            return RecipientHolder(
+                RecipientMesageLayoutBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
         }
     }
 
-    fun sentMessage(sendMessage: String, username: String) {
-        currentUsername = username
-        listMessage.add(sendMessage)
-        notifyDataSetChanged()
-    }
+    class MessageDiffCallback
+        : DiffUtil.ItemCallback<MessageDto>() {
 
-    fun newMessage(messageDto: MessageDto) {
-        listMessage.add(messageDto)
-        notifyDataSetChanged()
+        override fun areItemsTheSame(oldItem: MessageDto, newItem: MessageDto): Boolean {
+            return oldItem.from.id == newItem.from.id
+        }
+
+        override fun areContentsTheSame(oldItem: MessageDto, newItem: MessageDto): Boolean {
+            return oldItem == newItem
+        }
     }
 }
-
