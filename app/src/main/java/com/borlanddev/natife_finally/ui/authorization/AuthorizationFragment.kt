@@ -15,7 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
- class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
+class AuthorizationFragment : Fragment(R.layout.fragment_authorization) {
 
     private var binding: FragmentAuthorizationBinding? = null
     private val authorizationVM: AuthorizationVM by viewModels()

@@ -2,14 +2,14 @@ package com.borlanddev.natife_finally.ui.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.borlanddev.data.socket.Client
 import com.borlanddev.data.model.MessageDto
 import com.borlanddev.data.model.User
+import com.borlanddev.data.socket.Client
+import com.borlanddev.data.storage.Prefs
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.borlanddev.data.storage.Prefs
 
 class ChatVM @Inject constructor(
     private val recipientID: String,
