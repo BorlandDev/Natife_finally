@@ -1,4 +1,4 @@
-package com.borlanddev.data.model
+package com.borlanddev.domain.model
 
 data class UsersReceivedDto(val users: List<User>) : Payload
 

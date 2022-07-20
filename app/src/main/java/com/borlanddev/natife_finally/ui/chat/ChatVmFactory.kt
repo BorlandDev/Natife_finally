@@ -2,8 +2,8 @@ package com.borlanddev.natife_finally.ui.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.borlanddev.data.socket.Client
-import com.borlanddev.data.storage.Prefs
+import com.borlanddev.domain.socket.Client
+import com.borlanddev.domain.storage.Prefs
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

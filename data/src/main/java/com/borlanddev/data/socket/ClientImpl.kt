@@ -2,13 +2,13 @@ package com.borlanddev.data.socket
 
 import android.util.Log
 import com.borlanddev.data.consts.*
-import com.borlanddev.data.model.*
+import com.borlanddev.domain.model.*
+import com.borlanddev.domain.socket.Client
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import model.PingDto
 import java.io.*
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -18,7 +18,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class Client @Inject constructor() {
+class ClientImpl @Inject constructor() : Client {
 
     private val gson = Gson()
     private var clientID = ""
@@ -30,14 +30,14 @@ class Client @Inject constructor() {
     private var reader: BufferedReader? = null
     private var connect = MutableStateFlow(false)
     private val singedInFlow = MutableSharedFlow<Boolean>()
-    val singedIn: SharedFlow<Boolean> = singedInFlow
+    override val singedIn: SharedFlow<Boolean> = singedInFlow
     private val listUsersFlow = MutableSharedFlow<List<User>>()
-    val listUsers: SharedFlow<List<User>> = listUsersFlow
+    override val listUsers: SharedFlow<List<User>> = listUsersFlow
     private val newMessageFlow = MutableSharedFlow<MessageDto>()
-    val newMessage: SharedFlow<MessageDto> = newMessageFlow
+    override val newMessage: SharedFlow<MessageDto> = newMessageFlow
     private val scope = CoroutineScope(Job() + Dispatchers.IO)
 
-    fun connect(name: String) {
+    override fun connect(name: String) {
         scope.launch(Dispatchers.IO) {
             var serverIP = ""
             val udpSocket = DatagramSocket()
@@ -73,7 +73,7 @@ class Client @Inject constructor() {
         }
     }
 
-    fun getClientId() = clientID
+    override fun getClientId(): String = clientID
 
     private fun tcpConnect(serverIP: String) {
         socket = Socket(serverIP, TCP_PORT)
@@ -180,7 +180,7 @@ class Client @Inject constructor() {
         }
     }
 
-    fun getUsers() {
+    override fun getUsers() {
         scope.launch(Dispatchers.IO) {
             try {
                 val dto = gson.toJson(
@@ -197,7 +197,7 @@ class Client @Inject constructor() {
         }
     }
 
-    fun sendMessage(message: String, recipientID: String) {
+    override fun sendMessage(message: String, recipientID: String) {
         scope.launch(Dispatchers.IO) {
             try {
                 val dto = gson.toJson(
@@ -214,7 +214,7 @@ class Client @Inject constructor() {
         }
     }
 
-    fun disconnect() {
+    override fun disconnect() {
         scope.launch(Dispatchers.IO) {
             try {
                 val dto = gson.toJson(

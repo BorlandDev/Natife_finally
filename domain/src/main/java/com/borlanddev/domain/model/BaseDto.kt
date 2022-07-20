@@ -1,4 +1,4 @@
-package com.borlanddev.data.model
+package com.borlanddev.domain.model
 
 data class BaseDto(val action: Action, val payload: String) {
 
