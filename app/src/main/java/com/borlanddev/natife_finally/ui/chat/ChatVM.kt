@@ -2,10 +2,10 @@ package com.borlanddev.natife_finally.ui.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.borlanddev.natife_finally.helpers.Prefs
-import com.borlanddev.natife_finally.model.MessageDto
-import com.borlanddev.natife_finally.model.User
-import com.borlanddev.natife_finally.socket.Client
+import com.borlanddev.domain.model.MessageDto
+import com.borlanddev.domain.model.User
+import com.borlanddev.domain.socket.Client
+import com.borlanddev.domain.storage.Prefs
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch

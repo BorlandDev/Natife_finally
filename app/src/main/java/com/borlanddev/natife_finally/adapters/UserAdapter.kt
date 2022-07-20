@@ -5,12 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.borlanddev.domain.model.User
 import com.borlanddev.natife_finally.databinding.ListUsersBinding
-import com.borlanddev.natife_finally.model.User
 
 class UserAdapter(private var onItemClick: (User) -> Unit) :
     ListAdapter<User, UserAdapter.UserHolder>(UsersDiffCallback()) {
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserHolder {
         return UserHolder.create(parent)
@@ -19,7 +18,6 @@ class UserAdapter(private var onItemClick: (User) -> Unit) :
     override fun onBindViewHolder(holder: UserHolder, position: Int) {
         holder.bind(getItem(position), onItemClick)
     }
-
 
     class UserHolder(private val binding: ListUsersBinding) :
         RecyclerView.ViewHolder(binding.root) {

@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.borlanddev.domain.model.MessageDto
 import com.borlanddev.natife_finally.databinding.ClientMessageLayoutBinding
 import com.borlanddev.natife_finally.databinding.RecipientMesageLayoutBinding
-import com.borlanddev.natife_finally.model.MessageDto
 
 class ChatAdapter(private val checkID: (MessageDto) -> Boolean) :
     ListAdapter<MessageDto, RecyclerView.ViewHolder>(MessageDiffCallback()) {
